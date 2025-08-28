@@ -114,10 +114,24 @@
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
-  input.onchange = (e) => {
+  input.onchange = async (e) => {
   const file = e.target.files[0];
   if (file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/upload', {
+  method: 'POST',
+  body: formData,
+  });
+  const json = await res.json();
+  if (json.success) {
+  const previewPanel = $('preview-panel');
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(file);
+  previewPanel.innerHTML = '';
+  previewPanel.appendChild(img);
   editorModal.classList.remove('hidden');
+  }
   }
   };
   input.click();

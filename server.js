@@ -109,6 +109,19 @@ app.post('/process', upload.array('files'), async (req,res)=>{
   archive.finalize();
 });
 
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.json({
+    success: true,
+    file: {
+      name: req.file.originalname,
+      size: req.file.size,
+    },
+  });
+});
+
 app.get('/', (_req,res)=>res.sendFile(path.join(__dirname,'index.html')));
 app.get('*', (_req,res)=>res.status(404).send('Not found'));
 

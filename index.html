@@ -50,7 +50,20 @@
  <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
   <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl">
   <div class="p-8">
-  <h2 class="text-2xl font-bold mb-4">Image Editor</h2>
+  <div class="flex justify-between items-center mb-4">
+  <h2 class="text-2xl font-bold">Image Editor</h2>
+  <div>
+  <button id="rotate-left-btn" class="p-2 rounded-full hover:bg-gray-200">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+  </button>
+  <button id="rotate-right-btn" class="p-2 rounded-full hover:bg-gray-200">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+  </button>
+  <button id="crop-modal-btn" class="p-2 rounded-full hover:bg-gray-200">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+  </button>
+  </div>
+  </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
   <div class="md:col-span-2">
   <div id="preview-panel" class="bg-gray-200 h-96 flex items-center justify-center">
@@ -58,107 +71,110 @@
   </div>
   </div>
   <div>
-  <div id="resize-panel" class="mb-8">
-  <h3 class="text-lg font-semibold mb-4">Resize</h3>
+  <div class="mb-4">
+  <div class="flex border-b">
+  <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
+  <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
+  <button class="tab-btn" data-tab="social-media">Social Media</button>
+  </div>
+  </div>
+  <div id="by-size" class="tab-content">
   <div class="flex items-center mb-4">
-    <label for="width" class="w-16">Width:</label>
-    <input type="number" id="width" class="w-24 border border-gray-300 rounded px-2 py-1">
-    </div>
-    <div class="flex items-center mb-4">
-    <label for="height" class="w-16">Height:</label>
-    <input type="number" id="height" class="w-24 border border-gray-300 rounded px-2 py-1">
-    </div>
-    <div class="flex items-center">
-    <input type="checkbox" id="lock-aspect" class="mr-2" checked>
-    <label for="lock-aspect">Lock aspect ratio</label>
-    </div>
+  <label for="width" class="w-16">Width:</label>
+  <input type="number" id="width" class="w-24 border border-gray-300 rounded px-2 py-1">
+  </div>
+  <div class="flex items-center mb-4">
+  <label for="height" class="w-16">Height:</label>
+  <input type="number" id="height" class="w-24 border border-gray-300 rounded px-2 py-1">
+  </div>
+  <div class="flex items-center">
+  <input type="checkbox" id="lock-aspect" class="mr-2" checked>
+  <label for="lock-aspect">Lock aspect ratio</label>
+  </div>
+  </div>
+  <div id="as-percentage" class="tab-content hidden">
+  <div class="flex items-center mb-4">
+  <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
+  <span id="percentage-value">100%</span>
+  </div>
+  </div>
+  <div id="social-media" class="tab-content hidden">
+  <div class="flex items-center mb-4">
+  <label for="social-platform" class="mr-2">Platform:</label>
+  <select id="social-platform" class="border border-gray-300 rounded px-2 py-1 w-full">
+  <option value="">Select Platform</option>
+  </select>
+  </div>
+  <div class="flex items-center mb-4">
+  <label for="social-preset" class="mr-2">Preset:</label>
+  <select id="social-preset" class="border border-gray-300 rounded px-2 py-1 w-full" disabled>
+  <option value="">Select Preset</option>
+  </select>
+  </div>
   </div>
   <div class="mt-8">
-   <h3 class="text-lg font-semibold mb-4">As Percentage</h3>
-   <div class="flex items-center mb-4">
-    <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
-    <span id="percentage-value">100%</span>
-   </div>
-   <div class="flex items-center">
-    <label for="units" class="mr-2">Units:</label>
-    <select id="units" class="border border-gray-300 rounded px-2 py-1">
-     <option value="px">Pixels</option>
-     <option value="in">Inches</option>
-     <option value="cm">Centimeters</option>
-     <option value="mm">Millimeters</option>
-    </select>
-   </div>
-   <div class="mt-8">
-    <h3 class="text-lg font-semibold mb-4">Social Media Presets</h3>
-    <div class="flex items-center mb-4">
-     <label for="social-platform" class="mr-2">Platform:</label>
-     <select id="social-platform" class="border border-gray-300 rounded px-2 py-1 w-full">
-      <option value="">Select Platform</option>
-     </select>
-    </div>
-    <div class="flex items-center mb-4">
-     <label for="social-preset" class="mr-2">Preset:</label>
-     <select id="social-preset" class="border border-gray-300 rounded px-2 py-1 w-full" disabled>
-      <option value="">Select Preset</option>
-     </select>
-    </div>
-   </div>
-  </div>
-  <div id="crop-panel" class="mb-8">
-  <h3 class="text-lg font-semibold mb-4">Crop</h3>
-  <button id="crop-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full mb-4">
-    Crop
-    </button>
-    <div id="crop-controls" class="hidden">
-    <div class="flex items-center mb-4">
-    <label for="crop-width" class="w-16">Width:</label>
-    <input type="number" id="crop-width" class="w-24 border border-gray-300 rounded px-2 py-1">
-    </div>
-    <div class="flex items-center mb-4">
-    <label for="crop-height" class="w-16">Height:</label>
-    <input type="number" id="crop-height" class="w-24 border border-gray-300 rounded px-2 py-1">
-    </div>
-    <div class="flex items-center mb-4">
-    <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
-    <select id="aspect-ratio" class="border border-gray-300 rounded px-2 py-1">
-    <option value="free">Freeform</option>
-    <option value="original">Original</option>
-    <option value="1:1">1:1</option>
-    <option value="4:3">4:3</option>
-    <option value="16:9">16:9</option>
-    </select>
-    </div>
-    <button id="apply-crop-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full mb-2">
-    Apply Crop
-    </button>
-    <button id="reset-crop-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded w-full">
-    Reset
-    </button>
-    </div>
-  </div>
-  <div id="export-panel">
-  <h3 class="text-lg font-semibold mb-4">Export</h3>
+  <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
   <div class="flex items-center mb-4">
-    <label for="target-size" class="mr-2">Target File Size:</label>
-    <input type="number" id="target-size" class="w-24 border border-gray-300 rounded px-2 py-1">
-    <select id="target-size-unit" class="border border-gray-300 rounded px-2 py-1 ml-2">
-    <option value="KB">KB</option>
-    <option value="MB">MB</option>
-    </select>
-    </div>
-    <div class="flex items-center mb-4">
-    <label for="format" class="mr-2">Format:</label>
-    <select id="format" class="border border-gray-300 rounded px-2 py-1">
-    <option value="jpeg">JPEG</option>
-    <option value="png">PNG</option>
-    <option value="webp">WebP</option>
-    <option value="original">Original</option>
-    </select>
-    </div>
-    <button id="export-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full">
-    Export
-    </button>
+  <label for="target-size" class="mr-2">Target File Size (optional):</label>
+  <input type="number" id="target-size" class="w-24 border border-gray-300 rounded px-2 py-1">
+  <select id="target-size-unit" class="border border-gray-300 rounded px-2 py-1 ml-2">
+  <option value="KB">KB</option>
+  <option value="MB">MB</option>
+  </select>
   </div>
+  <div class="flex items-center mb-4">
+  <label for="format" class="mr-2">Save Image As:</label>
+  <select id="format" class="border border-gray-300 rounded px-2 py-1">
+  <option value="original">Original</option>
+  <option value="jpeg">JPEG</option>
+  <option value="png">PNG</option>
+  <option value="webp">WebP</option>
+  </select>
+  </div>
+  <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">
+  Export
+  </button>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+ </div>
+ <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl">
+  <div class="p-8">
+  <h2 class="text-2xl font-bold mb-4">Crop Image</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+  <div class="md:col-span-2">
+  <div id="crop-preview-panel" class="bg-gray-200 h-96">
+  </div>
+  </div>
+  <div>
+  <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
+  <div class="flex items-center mb-4">
+  <label for="crop-width" class="w-16">Width:</label>
+  <input type="number" id="crop-width" class="w-24 border border-gray-300 rounded px-2 py-1">
+  </div>
+  <div class="flex items-center mb-4">
+  <label for="crop-height" class="w-16">Height:</label>
+  <input type="number" id="crop-height" class="w-24 border border-gray-300 rounded px-2 py-1">
+  </div>
+  <div class="flex items-center mb-4">
+  <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
+  <select id="aspect-ratio" class="border border-gray-300 rounded px-2 py-1">
+  <option value="free">Freeform</option>
+  <option value="original">Original</option>
+  <option value="1:1">1:1 (Square)</option>
+  <option value="4:3">4:3 (Monitor)</option>
+  <option value="16:9">16:9 (Widescreen)</option>
+  </select>
+  </div>
+  <button id="apply-crop-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full mb-2">
+  Crop
+  </button>
+  <button id="reset-crop-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full">
+  Reset
+  </button>
   </div>
   </div>
   </div>
@@ -464,3 +480,45 @@
  });
 </script>
 <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active-tab'));
+      tab.classList.add('active-tab');
+
+      tabContents.forEach(content => {
+        if (content.id === tab.dataset.tab) {
+          content.classList.remove('hidden');
+        } else {
+          content.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  const cropModal = $('crop-modal');
+  const cropModalBtn = $('crop-modal-btn');
+  const cropPreviewPanel = $('crop-preview-panel');
+
+  cropModalBtn.addEventListener('click', () => {
+    const image = $('preview-panel').querySelector('img');
+    if (image) {
+      cropPreviewPanel.innerHTML = '';
+      const cropImage = document.createElement('img');
+      cropImage.src = image.src;
+      cropPreviewPanel.appendChild(cropImage);
+      cropModal.classList.remove('hidden');
+      cropper = new Cropper(cropImage, {
+        viewMode: 1,
+        autoCropArea: 1,
+        crop(event) {
+          cropWidthInput.value = Math.round(event.detail.width);
+          cropHeightInput.value = Math.round(event.detail.height);
+        },
+      });
+    }
+  });
+</script>

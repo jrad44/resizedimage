@@ -145,6 +145,26 @@ app.post('/process', upload.array('files'), async (req,res)=>{
   archive.finalize();
 });
 
+app.post('/process-crop', upload.single('file'), async (req, res) => {
+  const { cropData } = req.body;
+  const { x, y, width, height } = JSON.parse(cropData);
+
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  try {
+    const outputBuffer = await sharp(req.file.buffer)
+      .extract({ left: x, top: y, width, height })
+      .toBuffer();
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', 'attachment; filename="cropped.png"');
+    res.send(outputBuffer);
+  } catch (error) {
+    res.status(500).send('Processing failed');
+  }
+});
+
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');

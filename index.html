@@ -350,14 +350,26 @@
  const exportBtn = $('export-btn');
 
  exportBtn.addEventListener('click', async () => {
-  const file = $('preview-panel').querySelector('img').src;
-  if (!file) {
-  alert('Please upload an image first.');
-  return;
+  const image = $('preview-panel').querySelector('img');
+  if (!image || !image.src) {
+    alert('Please upload an image first.');
+    return;
   }
 
+  let fileBlob;
+  let endpoint = '/process';
   const form = new FormData();
-  form.append('file', await (await fetch(file)).blob());
+
+  if (cropper) {
+    const cropData = cropper.getData(true);
+    form.append('cropData', JSON.stringify(cropData));
+    endpoint = '/process-crop';
+    fileBlob = await (await fetch(image.src)).blob();
+  } else {
+    fileBlob = await (await fetch(image.src)).blob();
+  }
+
+  form.append('file', fileBlob);
   form.append('w', widthInput.value);
   form.append('h', heightInput.value);
   form.append('fmt', $('format').value);
@@ -366,24 +378,24 @@
   form.append('targetSize', $('target-size').value);
   form.append('targetSizeUnit', $('target-size-unit').value);
 
-  const res = await fetch('/process', {
-  method: 'POST',
-  body: form,
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    body: form,
   });
 
   if (res.ok) {
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `resized.${$('format').value}`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `resized.${$('format').value}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   } else {
-  alert('An error occurred during processing.');
+    alert('An error occurred during processing.');
   }
- });
+});
 
  const cropBtn = $('crop-btn');
  const cropControls = $('crop-controls');

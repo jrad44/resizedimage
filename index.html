@@ -106,11 +106,58 @@
   </div>
   <div id="crop-panel" class="mb-8">
   <h3 class="text-lg font-semibold mb-4">Crop</h3>
-  <p>Crop controls will go here.</p>
+  <button id="crop-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full mb-4">
+    Crop
+    </button>
+    <div id="crop-controls" class="hidden">
+    <div class="flex items-center mb-4">
+    <label for="crop-width" class="w-16">Width:</label>
+    <input type="number" id="crop-width" class="w-24 border border-gray-300 rounded px-2 py-1">
+    </div>
+    <div class="flex items-center mb-4">
+    <label for="crop-height" class="w-16">Height:</label>
+    <input type="number" id="crop-height" class="w-24 border border-gray-300 rounded px-2 py-1">
+    </div>
+    <div class="flex items-center mb-4">
+    <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
+    <select id="aspect-ratio" class="border border-gray-300 rounded px-2 py-1">
+    <option value="free">Freeform</option>
+    <option value="original">Original</option>
+    <option value="1:1">1:1</option>
+    <option value="4:3">4:3</option>
+    <option value="16:9">16:9</option>
+    </select>
+    </div>
+    <button id="apply-crop-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full mb-2">
+    Apply Crop
+    </button>
+    <button id="reset-crop-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded w-full">
+    Reset
+    </button>
+    </div>
   </div>
   <div id="export-panel">
   <h3 class="text-lg font-semibold mb-4">Export</h3>
-  <p>Export controls will go here.</p>
+  <div class="flex items-center mb-4">
+    <label for="target-size" class="mr-2">Target File Size:</label>
+    <input type="number" id="target-size" class="w-24 border border-gray-300 rounded px-2 py-1">
+    <select id="target-size-unit" class="border border-gray-300 rounded px-2 py-1 ml-2">
+    <option value="KB">KB</option>
+    <option value="MB">MB</option>
+    </select>
+    </div>
+    <div class="flex items-center mb-4">
+    <label for="format" class="mr-2">Format:</label>
+    <select id="format" class="border border-gray-300 rounded px-2 py-1">
+    <option value="jpeg">JPEG</option>
+    <option value="png">PNG</option>
+    <option value="webp">WebP</option>
+    <option value="original">Original</option>
+    </select>
+    </div>
+    <button id="export-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full">
+    Export
+    </button>
   </div>
   </div>
   </div>
@@ -299,4 +346,107 @@
  });
 
  loadSocialPresets();
+
+ const exportBtn = $('export-btn');
+
+ exportBtn.addEventListener('click', async () => {
+  const file = $('preview-panel').querySelector('img').src;
+  if (!file) {
+  alert('Please upload an image first.');
+  return;
+  }
+
+  const form = new FormData();
+  form.append('file', await (await fetch(file)).blob());
+  form.append('w', widthInput.value);
+  form.append('h', heightInput.value);
+  form.append('fmt', $('format').value);
+  form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
+  form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
+  form.append('targetSize', $('target-size').value);
+  form.append('targetSizeUnit', $('target-size-unit').value);
+
+  const res = await fetch('/process', {
+  method: 'POST',
+  body: form,
+  });
+
+  if (res.ok) {
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `resized.${$('format').value}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  } else {
+  alert('An error occurred during processing.');
+  }
+ });
+
+ const cropBtn = $('crop-btn');
+ const cropControls = $('crop-controls');
+ const applyCropBtn = $('apply-crop-btn');
+ const resetCropBtn = $('reset-crop-btn');
+ const aspectRatioSelect = $('aspect-ratio');
+ const cropWidthInput = $('crop-width');
+ const cropHeightInput = $('crop-height');
+ let cropper;
+
+ cropBtn.addEventListener('click', () => {
+  if (cropper) {
+  cropper.destroy();
+  cropper = null;
+  cropControls.classList.add('hidden');
+  cropBtn.textContent = 'Crop';
+  } else {
+  const image = $('preview-panel').querySelector('img');
+  if (image) {
+  cropper = new Cropper(image, {
+  viewMode: 1,
+  autoCropArea: 1,
+  crop(event) {
+  cropWidthInput.value = Math.round(event.detail.width);
+  cropHeightInput.value = Math.round(event.detail.height);
+  },
+  });
+  cropControls.classList.remove('hidden');
+  cropBtn.textContent = 'Cancel Crop';
+  }
+  }
+ });
+
+ applyCropBtn.addEventListener('click', () => {
+  if (cropper) {
+  const croppedCanvas = cropper.getCroppedCanvas();
+  const image = $('preview-panel').querySelector('img');
+  image.src = croppedCanvas.toDataURL();
+  cropper.destroy();
+  cropper = null;
+  cropControls.classList.add('hidden');
+  cropBtn.textContent = 'Crop';
+  }
+ });
+
+ resetCropBtn.addEventListener('click', () => {
+  if (cropper) {
+  cropper.reset();
+  }
+ });
+
+ aspectRatioSelect.addEventListener('change', () => {
+  if (cropper) {
+  const aspectRatio = aspectRatioSelect.value;
+  if (aspectRatio === 'free') {
+  cropper.setAspectRatio(NaN);
+  } else if (aspectRatio === 'original') {
+  cropper.setAspectRatio(originalWidth / originalHeight);
+  } else {
+  const [w, h] = aspectRatio.split(':');
+  cropper.setAspectRatio(w / h);
+  }
+  }
+ });
 </script>
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>

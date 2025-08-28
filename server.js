@@ -55,6 +55,8 @@ app.post('/process', upload.array('files'), async (req,res)=>{
   const requestedFmt = (req.body.fmt||'jpeg').toLowerCase();
   const q = Math.round((parseFloat(req.body.q)||0.85)*100);
   const keep = req.body.keepAspect === '1';
+  const targetSize = parseInt(req.body.targetSize, 10);
+  const targetSizeUnit = req.body.targetSizeUnit || 'KB';
   const files = req.files||[];
   if (!files.length) return res.status(400).send('No files');
 
@@ -83,8 +85,42 @@ app.post('/process', upload.array('files'), async (req,res)=>{
     } catch {}
     if (keep) img = img.resize(w,h,{ fit:'inside', withoutEnlargement:false });
     else img = img.resize(w,h,{ fit:'cover', position:'centre' });
+
+    if (outFmt === 'original') {
+      return buf;
+    }
+
+    let quality = q;
+    if (targetSize && (outFmt === 'jpeg' || outFmt === 'webp')) {
+      const targetBytes = targetSize * (targetSizeUnit === 'MB' ? 1024 * 1024 : 1024);
+      let minQuality = 1;
+      let maxQuality = 100;
+      let currentQuality = quality;
+      let outputBuffer;
+
+      for (let i = 0; i < 10; i++) {
+        if (outFmt === 'jpeg') {
+          outputBuffer = await img.jpeg({ quality: currentQuality, mozjpeg: true }).toBuffer();
+        } else {
+          outputBuffer = await img.webp({ quality: currentQuality }).toBuffer();
+        }
+
+        if (outputBuffer.length <= targetBytes) {
+          minQuality = currentQuality;
+        } else {
+          maxQuality = currentQuality;
+        }
+        currentQuality = Math.round((minQuality + maxQuality) / 2);
+        if (maxQuality - minQuality < 2) {
+          break;
+        }
+      }
+      return outputBuffer;
+    }
+
     if (outFmt==='png') return await img.png({ compressionLevel:9 }).toBuffer();
-    return await img.jpeg({ quality:q, mozjpeg:true }).toBuffer();
+    if (outFmt==='webp') return await img.webp({ quality }).toBuffer();
+    return await img.jpeg({ quality, mozjpeg:true }).toBuffer();
   }
 
   if (files.length===1){
@@ -104,7 +140,7 @@ app.post('/process', upload.array('files'), async (req,res)=>{
   for (const f of files){
     const out = await processOne(f.buffer);
     const name = f.originalname.replace(/\.[^.]+$/,'');
-    archive.append(out,{ name:`${name}_${w}x${h}.jpg` });
+    archive.append(out,{ name:`${name}_${w}x${h}.${requestedFmt}` });
   }
   archive.finalize();
 });

@@ -91,6 +91,20 @@
   <input type="checkbox" id="lock-aspect" class="mr-2" checked>
   <label for="lock-aspect">Lock aspect ratio</label>
   </div>
+  <div class="flex items-center mt-4">
+  <input type="checkbox" id="background-fill" class="mr-2">
+  <label for="background-fill">Background Fill</label>
+  <input type="color" id="background-color" class="ml-2" value="#ffffff">
+  </div>
+  </div>
+  <div class="flex items-center mt-4">
+  <label for="as-percentage-units" class="mr-2">Units:</label>
+  <select id="as-percentage-units" class="border border-gray-300 rounded px-2 py-1">
+  <option value="px">Pixels</option>
+  <option value="in">Inches</option>
+  <option value="cm">Centimeters</option>
+  <option value="mm">Millimeters</option>
+  </select>
   </div>
   <div id="as-percentage" class="tab-content hidden">
   <div class="flex items-center mb-4">
@@ -399,6 +413,9 @@
   }
 
   form.append('file', fileBlob);
+  if ($('background-fill').checked) {
+    form.append('backgroundColor', $('background-color').value);
+  }
   form.append('w', widthInput.value);
   form.append('h', heightInput.value);
   form.append('fmt', $('format').value);

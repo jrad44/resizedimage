@@ -84,7 +84,7 @@ app.post('/process', upload.array('files'), async (req,res)=>{
       if (inFmt==='heic'||inFmt==='heif') outFmt='jpeg';
     } catch {}
     if (keep) img = img.resize(w,h,{ fit:'inside', withoutEnlargement:false });
-    else img = img.resize(w,h,{ fit:'cover', position:'centre' });
+    else img = img.resize(w,h,{ fit:'cover', position:'centre', background: req.body.backgroundColor || '#ffffff' });
 
     if (outFmt === 'original') {
       return buf;

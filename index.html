@@ -88,6 +88,21 @@
      <option value="mm">Millimeters</option>
     </select>
    </div>
+   <div class="mt-8">
+    <h3 class="text-lg font-semibold mb-4">Social Media Presets</h3>
+    <div class="flex items-center mb-4">
+     <label for="social-platform" class="mr-2">Platform:</label>
+     <select id="social-platform" class="border border-gray-300 rounded px-2 py-1 w-full">
+      <option value="">Select Platform</option>
+     </select>
+    </div>
+    <div class="flex items-center mb-4">
+     <label for="social-preset" class="mr-2">Preset:</label>
+     <select id="social-preset" class="border border-gray-300 rounded px-2 py-1 w-full" disabled>
+      <option value="">Select Preset</option>
+     </select>
+    </div>
+   </div>
   </div>
   <div id="crop-panel" class="mb-8">
   <h3 class="text-lg font-semibold mb-4">Crop</h3>
@@ -240,4 +255,48 @@
  // Update originalWidth and originalHeight when a new image is loaded
  // This part needs to be integrated into the single upload onchange handler
  // I will modify the single upload onchange handler to include this.
+
+ const socialPlatformSelect = $('social-platform');
+ const socialPresetSelect = $('social-preset');
+
+ let socialPresets = {};
+
+ async function loadSocialPresets() {
+  const res = await fetch('/socialPresets.json');
+  socialPresets = await res.json();
+  for (const platform in socialPresets) {
+  const option = document.createElement('option');
+  option.value = platform;
+  option.textContent = platform;
+  socialPlatformSelect.appendChild(option);
+  }
+ }
+
+ socialPlatformSelect.addEventListener('change', () => {
+  const platform = socialPlatformSelect.value;
+  socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
+  if (platform) {
+  socialPresetSelect.disabled = false;
+  for (const preset in socialPresets[platform]) {
+  const option = document.createElement('option');
+  option.value = preset;
+  option.textContent = preset;
+  socialPresetSelect.appendChild(option);
+  }
+  } else {
+  socialPresetSelect.disabled = true;
+  }
+ });
+
+ socialPresetSelect.addEventListener('change', () => {
+  const platform = socialPlatformSelect.value;
+  const preset = socialPresetSelect.value;
+  if (platform && preset) {
+  const { width, height } = socialPresets[platform][preset];
+  widthInput.value = width;
+  heightInput.value = height;
+  }
+ });
+
+ loadSocialPresets();
 </script>

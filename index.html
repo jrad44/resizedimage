@@ -60,7 +60,18 @@
   <div>
   <div id="resize-panel" class="mb-8">
   <h3 class="text-lg font-semibold mb-4">Resize</h3>
-  <p>Resize controls will go here.</p>
+  <div class="flex items-center mb-4">
+    <label for="width" class="w-16">Width:</label>
+    <input type="number" id="width" class="w-24 border border-gray-300 rounded px-2 py-1">
+    </div>
+    <div class="flex items-center mb-4">
+    <label for="height" class="w-16">Height:</label>
+    <input type="number" id="height" class="w-24 border border-gray-300 rounded px-2 py-1">
+    </div>
+    <div class="flex items-center">
+    <input type="checkbox" id="lock-aspect" class="mr-2" checked>
+    <label for="lock-aspect">Lock aspect ratio</label>
+    </div>
   </div>
   <div id="crop-panel" class="mb-8">
   <h3 class="text-lg font-semibold mb-4">Crop</h3>
@@ -128,6 +139,12 @@
   const previewPanel = $('preview-panel');
   const img = document.createElement('img');
   img.src = URL.createObjectURL(file);
+  img.onload = () => {
+  originalWidth = img.width;
+  originalHeight = img.height;
+  widthInput.value = originalWidth;
+  heightInput.value = originalHeight;
+  };
   previewPanel.innerHTML = '';
   previewPanel.appendChild(img);
   editorModal.classList.remove('hidden');
@@ -154,4 +171,28 @@
   location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
   }
  });
+
+ const widthInput = $('width');
+ const heightInput = $('height');
+ const lockAspectCheckbox = $('lock-aspect');
+ let originalWidth, originalHeight;
+
+ function handleResize() {
+  if (!originalWidth || !originalHeight) return;
+
+  const aspectRatio = originalWidth / originalHeight;
+  const width = parseInt(widthInput.value);
+  const height = parseInt(heightInput.value);
+
+  if (lockAspectCheckbox.checked) {
+  if (document.activeElement === widthInput) {
+  heightInput.value = Math.round(width / aspectRatio);
+  } else {
+  widthInput.value = Math.round(height * aspectRatio);
+  }
+  }
+ }
+
+ widthInput.addEventListener('input', handleResize);
+ heightInput.addEventListener('input', handleResize);
 </script>

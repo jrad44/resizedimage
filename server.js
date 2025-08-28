@@ -145,6 +145,10 @@ app.post('/process', upload.array('files'), async (req,res)=>{
   archive.finalize();
 });
 
+app.get('/socialPresets.json', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'socialPresets.json'));
+});
+
 app.post('/process-crop', upload.single('file'), async (req, res) => {
   const { cropData } = req.body;
   const { x, y, width, height } = JSON.parse(cropData);

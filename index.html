@@ -6,6 +6,11 @@
   body {
   font-family: system-ui;
   }
+  #preview-panel img, #crop-preview-panel img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
  </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -59,7 +64,7 @@
   <button id="rotate-right-btn" class="p-2 rounded-full hover:bg-gray-200">
   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
   </button>
-  <button id="crop-modal-btn" class="p-2 rounded-full hover:bg-gray-200">
+  <button id="crop-btn" class="p-2 rounded-full hover:bg-gray-200">
   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
   </button>
   </div>
@@ -449,46 +454,49 @@
   });
 
   const cropBtn = $('crop-btn');
-  const cropControls = $('crop-controls');
+  const cropModal = $('crop-modal');
+  const cropPreviewPanel = $('crop-preview-panel');
   const applyCropBtn = $('apply-crop-btn');
   const resetCropBtn = $('reset-crop-btn');
   const aspectRatioSelect = $('aspect-ratio');
   const cropWidthInput = $('crop-width');
   const cropHeightInput = $('crop-height');
   let cropper;
+  let currentImageSrc = '';
 
   cropBtn.addEventListener('click', () => {
-   if (cropper) {
-   cropper.destroy();
-   cropper = null;
-   cropControls.classList.add('hidden');
-   cropBtn.textContent = 'Crop';
-   } else {
    const image = $('preview-panel').querySelector('img');
-   if (image) {
-   cropper = new Cropper(image, {
-   viewMode: 1,
-   autoCropArea: 1,
-   crop(event) {
-   cropWidthInput.value = Math.round(event.detail.width);
-   cropHeightInput.value = Math.round(event.detail.height);
-   },
+   if (!image) {
+     alert('Please upload an image first.');
+     return;
+   }
+   currentImageSrc = image.src;
+   cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+   const cropImage = cropPreviewPanel.querySelector('img');
+
+   cropModal.classList.remove('hidden');
+
+   if (cropper) {
+     cropper.destroy();
+   }
+   cropper = new Cropper(cropImage, {
+     viewMode: 1,
+     autoCropArea: 1,
+     crop(event) {
+       cropWidthInput.value = Math.round(event.detail.width);
+       cropHeightInput.value = Math.round(event.detail.height);
+     },
    });
-   cropControls.classList.remove('hidden');
-   cropBtn.textContent = 'Cancel Crop';
-   }
-   }
   });
 
   applyCropBtn.addEventListener('click', () => {
    if (cropper) {
-   const croppedCanvas = cropper.getCroppedCanvas();
-   const image = $('preview-panel').querySelector('img');
-   image.src = croppedCanvas.toDataURL();
-   cropper.destroy();
-   cropper = null;
-   cropControls.classList.add('hidden');
-   cropBtn.textContent = 'Crop';
+     const croppedCanvas = cropper.getCroppedCanvas();
+     const image = $('preview-panel').querySelector('img');
+     image.src = croppedCanvas.toDataURL();
+     cropper.destroy();
+     cropper = null;
+     cropModal.classList.add('hidden');
    }
   });
 
@@ -500,15 +508,19 @@
 
   aspectRatioSelect.addEventListener('change', () => {
    if (cropper) {
-   const aspectRatio = aspectRatioSelect.value;
-   if (aspectRatio === 'free') {
-   cropper.setAspectRatio(NaN);
-   } else if (aspectRatio === 'original') {
-   cropper.setAspectRatio(originalWidth / originalHeight);
-   } else {
-   const [w, h] = aspectRatio.split(':');
-   cropper.setAspectRatio(w / h);
-   }
+     const aspectRatio = aspectRatioSelect.value;
+     if (aspectRatio === 'free') {
+       cropper.setAspectRatio(NaN);
+     } else if (aspectRatio === 'original') {
+       // Need to get original dimensions of the image in the crop modal
+       const cropImage = cropPreviewPanel.querySelector('img');
+       if (cropImage) {
+         cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
+       }
+     } else {
+       const [w, h] = aspectRatio.split(':');
+       cropper.setAspectRatio(w / h);
+     }
    }
   });
 

@@ -195,9 +195,11 @@
  (async () => {
   await redeem();
   if (await isPro()) {
-  // Pro users have access to batch uploads
+  $('unlock-pro-btn').style.display = 'none';
   }
  })();
+
+ $('unlock-pro-btn').onclick = () => location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
 
  uploadSingleBtn.addEventListener('click', () => {
   const input = document.createElement('input');

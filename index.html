@@ -73,6 +73,22 @@
     <label for="lock-aspect">Lock aspect ratio</label>
     </div>
   </div>
+  <div class="mt-8">
+   <h3 class="text-lg font-semibold mb-4">As Percentage</h3>
+   <div class="flex items-center mb-4">
+    <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
+    <span id="percentage-value">100%</span>
+   </div>
+   <div class="flex items-center">
+    <label for="units" class="mr-2">Units:</label>
+    <select id="units" class="border border-gray-300 rounded px-2 py-1">
+     <option value="px">Pixels</option>
+     <option value="in">Inches</option>
+     <option value="cm">Centimeters</option>
+     <option value="mm">Millimeters</option>
+    </select>
+   </div>
+  </div>
   <div id="crop-panel" class="mb-8">
   <h3 class="text-lg font-semibold mb-4">Crop</h3>
   <p>Crop controls will go here.</p>
@@ -137,14 +153,16 @@
   const json = await res.json();
   if (json.success) {
   const previewPanel = $('preview-panel');
-  const img = document.createElement('img');
-  img.src = URL.createObjectURL(file);
+  const img = new Image();
   img.onload = () => {
   originalWidth = img.width;
   originalHeight = img.height;
   widthInput.value = originalWidth;
   heightInput.value = originalHeight;
+  percentageSlider.value = 100;
+  percentageValueSpan.textContent = '100%';
   };
+  img.src = URL.createObjectURL(file);
   previewPanel.innerHTML = '';
   previewPanel.appendChild(img);
   editorModal.classList.remove('hidden');
@@ -195,4 +213,31 @@
 
  widthInput.addEventListener('input', handleResize);
  heightInput.addEventListener('input', handleResize);
+
+ const percentageSlider = $('percentage-slider');
+ const percentageValueSpan = $('percentage-value');
+ const unitsSelect = $('units');
+
+ function updatePercentageResize() {
+  if (!originalWidth || !originalHeight) return;
+
+  const percentage = parseInt(percentageSlider.value);
+  percentageValueSpan.textContent = `${percentage}%`;
+
+  const newWidth = Math.round(originalWidth * (percentage / 100));
+  const newHeight = Math.round(originalHeight * (percentage / 100));
+
+  widthInput.value = newWidth;
+  heightInput.value = newHeight;
+ }
+
+ percentageSlider.addEventListener('input', updatePercentageResize);
+ unitsSelect.addEventListener('change', () => {
+  // For now, just update the display, actual unit conversion will happen on the backend
+  console.log(`Selected unit: ${unitsSelect.value}`);
+ });
+
+ // Update originalWidth and originalHeight when a new image is loaded
+ // This part needs to be integrated into the single upload onchange handler
+ // I will modify the single upload onchange handler to include this.
 </script>

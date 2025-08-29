@@ -11,20 +11,35 @@
 
   <nav class="bg-gray-800 p-4">
     <div class="container mx-auto flex justify-between items-center">
-      <a href="/" class="text-2xl font-bold">ResizedImage.com</a>
-      <div>
-        <a href="/image-resize" class="mr-4">Image Resize</a>
-        <a href="/pdf-merge" class="mr-4">PDF Merge</a>
-        <a href="/bg-remover" class="mr-4">BG Remover</a>
-        <a href="/login" class="mr-4">Login</a>
-        <a href="/signup" class="mr-4">Sign Up</a>
+      <a href="/" class="text-xl font-bold">ResizedImage.com</a>
+      <div class="hidden md:flex items-center space-x-4">
+        <a href="/image-resize">Image Resize</a>
+        <a href="/pdf-merge">PDF Merge</a>
+        <a href="/bg-remover">BG Remover</a>
+        <a href="/login">Login</a>
+        <a href="/signup">Sign Up</a>
         <a href="/pro" class="bg-purple-600 px-4 py-2 rounded">Unlock Pro $2</a>
+      </div>
+      <div class="md:hidden">
+        <button id="hamburger-button" class="text-white focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
       </div>
     </div>
   </nav>
 
+  <div id="mobile-menu" class="md:hidden bg-gray-800 px-4 pt-2 pb-4 space-y-1 hidden">
+    <a href="/image-resize" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Image Resize</a>
+    <a href="/pdf-merge" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">PDF Merge</a>
+    <a href="/bg-remover" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">BG Remover</a>
+    <a href="/login" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Login</a>
+    <a href="/signup" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Sign Up</a>
+    <a href="/pro" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-purple-700 bg-purple-600">Unlock Pro $2</a>
+  </div>
+</nav>
+  </nav>
+
   <header class="text-center py-16">
-    <h1 class="text-5xl font-bold">ResizedImage.com</h1>
     <p class="text-xl mt-4">Free online tool to resize your images while maintaining quality</p>
   </header>
 
@@ -587,6 +602,13 @@
        image.src = canvas.toDataURL();
      }
    });
+  });
+
+  const hamburgerButton = $('hamburger-button');
+  const mobileMenu = $('mobile-menu');
+
+  hamburgerButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
   });
  </script>
 </body>

@@ -6,9 +6,11 @@
   <title>ResizedImage.com</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="new-design.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4695148041573402"
      crossorigin="anonymous"></script>
   <style>
+    /* Existing styles for modals and inputs */
     #preview-panel img, #crop-preview-panel img {
       max-width: 100%;
       max-height: 100%;
@@ -60,102 +62,245 @@
     }
   </style>
 </head>
-<body class="text-white" style="background: linear-gradient(to right, #1a202c, #2d3748);">
+<body class="text-white">
 
-  <nav class="bg-gray-800 p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <a href="/" class="text-xl font-bold">ResizedImage.com</a>
-      <div class="hidden md:flex items-center space-x-4">
-        <a href="/image-resize">Image Resize</a>
-        <a href="/pdf-merge">PDF Merge</a>
-        <a href="/bg-remover">BG Remover</a>
-        <a href="/login">Login</a>
-        <a href="/signup">Sign Up</a>
-        <a href="/pro" class="bg-purple-600 px-4 py-2 rounded">Unlock Pro $2</a>
-      </div>
-      <div class="md:hidden">
-        <button id="hamburger-button" class="text-white focus:outline-none">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-        </button>
-      </div>
+  <div class="min-h-screen text-foreground relative overflow-hidden">
+    <!-- Animated background with soft radial glows -->
+    <div class="pointer-events-none absolute inset-0 -z-10">
+      <div class="absolute inset-0 bg-animated opacity-90"></div>
+      <div 
+        class="absolute inset-0 mix-blend-soft-light opacity-[0.08]"
+        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence baseFrequency=%220.75%22 numOctaves=%222%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>')"
+      ></div>
     </div>
-  </nav>
 
-  <div id="mobile-menu" class="md:hidden bg-gray-800 px-4 pt-2 pb-4 space-y-1 hidden">
-    <a href="/image-resize" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Image Resize</a>
-    <a href="/pdf-merge" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">PDF Merge</a>
-    <a href="/bg-remover" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">BG Remover</a>
-    <a href="/login" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Login</a>
-    <a href="/signup" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Sign Up</a>
-    <a href="/pro" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-purple-700 bg-purple-600">Unlock Pro $2</a>
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-20">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+        <div class="flex items-center justify-between rounded-full glass-nav px-4 py-2">
+          <div class="flex items-center gap-3">
+            <div class="size-8 rounded-lg glass-button grid place-items-center text-lg">
+              📷
+            </div>
+            <a href="/" class="font-semibold tracking-tight text-foreground">
+              ResizedImage.com
+            </a>
+          </div>
+          <div class="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+            <a href="/image-resize" class="hover:text-foreground transition-colors">
+              Image Resize
+            </a>
+            <a href="/pdf-merge" class="hover:text-foreground transition-colors">
+              PDF Merge
+            </a>
+            <a href="/bg-remover" class="hover:text-foreground transition-colors">
+              BG Remover
+            </a>
+          </div>
+          <div class="flex items-center gap-2">
+            <button variant="outline" size="sm" class="glass-button rounded-full">
+              Login
+            </button>
+            <button variant="outline" size="sm" class="glass-button rounded-full">
+              Sign Up
+            </button>
+            <button 
+              size="sm" 
+              class="ml-1 rounded-full font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              Unlock Pro $2
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu (hidden by default) -->
+    <div id="mobile-menu" class="md:hidden bg-gray-800 px-4 pt-2 pb-4 space-y-1 hidden">
+      <a href="/image-resize" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Image Resize</a>
+      <a href="/pdf-merge" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">PDF Merge</a>
+      <a href="/bg-remover" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">BG Remover</a>
+      <a href="/login" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Login</a>
+      <a href="/signup" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Sign Up</a>
+      <a href="/pro" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-purple-700 bg-purple-600">Unlock Pro $2</a>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center pt-16 md:pt-24">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+        ResizedImage
+      </h1>
+      <p class="mt-3 text-muted-foreground text-lg">
+        Resize images effortlessly for free
+      </p>
+    </header>
+
+    <!-- Upload Cards -->
+    <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-10">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Single Image Upload -->
+        <div class="rounded-2xl glass-card p-6">
+          <div class="flex flex-col items-center text-center gap-2">
+            <div class="text-4xl mb-2">🖼️</div>
+            <h2 class="text-xl font-semibold text-foreground">Single Image Upload</h2>
+            <p class="text-xs text-muted-foreground">Drag & drop or</p>
+
+            <button
+              id="upload-single"
+              class="mt-1 inline-flex items-center gap-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4 py-2"
+            >
+              <span class="text-lg">📁</span> Browse File
+            </button>
+
+            <input
+              id="single-file-input"
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp"
+              class="hidden"
+            />
+
+            <p class="mt-3 text-xs text-muted-foreground">
+              Supports: JPG, PNG, WEBP (Max 10MB)
+            </p>
+          </div>
+        </div>
+
+        <!-- PRO Batch Upload -->
+        <div class="rounded-2xl glass-card p-6">
+          <div class="flex flex-col items-center text-center gap-2">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="text-4xl">🗝️</div>
+              <span class="text-[10px] font-bold bg-accent text-accent-foreground px-2 py-0.5 rounded-full">
+                PRO
+              </span>
+            </div>
+            <h2 class="text-xl font-semibold text-foreground">$2.00 PRO Batch Upload</h2>
+            <p class="max-w-md text-sm text-muted-foreground">
+              Unlock for Lifetime access to all PRO features and future website tools. 
+              Your support truly means the world to us 😊
+            </p>
+            <p class="text-xs text-muted-foreground">Drag & drop or</p>
+
+            <button
+              id="upload-batch"
+              class="mt-1 inline-flex items-center gap-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4 py-2"
+            >
+              <span class="text-lg">📁</span> Browse Files
+            </button>
+
+            <input
+              id="batch-file-input"
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.png,.webp"
+              class="hidden"
+            />
+
+            <p class="mt-3 text-xs text-muted-foreground">
+              Supports: JPG, PNG, WEBP (Max 10MB each)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div id="error-display" class="mt-4 rounded-lg bg-destructive/15 border border-destructive/30 text-destructive-foreground px-4 py-2 hidden">
+        <!-- Error message will be inserted here -->
+      </div>
+
+      <!-- Features Section -->
+      <section class="mt-12">
+        <h3 class="text-center text-3xl font-bold text-foreground mb-8">
+          Why Use ResizedImage.com?
+        </h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="rounded-2xl glass-card p-6 text-center">
+            <div class="text-3xl mb-2">⚡</div>
+            <div class="font-semibold text-lg text-foreground mb-2">Lightning Fast</div>
+            <p class="text-muted-foreground">Resize images in seconds without compromising quality using our optimized algorithms.</p>
+          </div>
+          <div class="rounded-2xl glass-card p-6 text-center">
+            <div class="text-3xl mb-2">🔒</div>
+            <div class="font-semibold text-lg text-foreground mb-2">Secure & Private</div>
+            <p class="text-muted-foreground">Your images are processed in your browser and never uploaded to our servers.</p>
+          </div>
+          <div class="rounded-2xl glass-card p-6 text-center">
+            <div class="text-3xl mb-2">🎚️</div>
+            <div class="font-semibold text-lg text-foreground mb-2">Advanced Controls</div>
+            <p class="text-muted-foreground">Precise dimension control, quality adjustment, and multiple format options.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials Section -->
+      <section class="mt-16">
+        <h3 class="text-center text-3xl font-bold text-foreground mb-2">
+          Trusted by Thousands
+        </h3>
+        <p class="text-center text-muted-foreground mb-12">
+          See what our users say about ResizedImage.com
+        </p>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="text-4xl mb-3">👩‍🎨</div>
+            <div class="flex justify-center mb-3">
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+            </div>
+            <p class="text-muted-foreground mb-4 italic text-lg leading-relaxed">"This tool is incredible! I resize hundreds of images daily for my clients, and ResizedImage.com makes it so easy. The quality is always perfect."</p>
+            <div class="font-semibold text-foreground">Sarah Chen</div>
+            <div class="text-sm text-muted-foreground">Graphic Designer</div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl mb-3">👨‍💼</div>
+            <div class="flex justify-center mb-3">
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+            </div>
+            <p class="text-muted-foreground mb-4 italic text-lg leading-relaxed">"The batch upload feature is a game-changer. I can resize all our product images in minutes instead of hours. Worth every penny!"</p>
+            <div class="font-semibold text-foreground">Mike Rodriguez</div>
+            <div class="text-sm text-muted-foreground">E-commerce Manager</div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl mb-3">✍️</div>
+            <div class="flex justify-center mb-3">
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+              <span class="text-accent text-lg">⭐</span>
+            </div>
+            <p class="text-muted-foreground mb-4 italic text-lg leading-relaxed">"Simple, fast, and secure. I love that my images never leave my browser. Perfect for optimizing blog images without quality loss."</p>
+            <div class="font-semibold text-foreground">Emily Watson</div>
+            <div class="text-sm text-muted-foreground">Blogger</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-muted-foreground">
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="/terms" class="hover:text-foreground transition-colors">Terms</a>
+        <a href="/privacy" class="hover:text-foreground transition-colors">Privacy</a>
+        <a href="/contact" class="hover:text-foreground transition-colors">Contact</a>
+        <a href="/api" class="hover:text-foreground transition-colors">API</a>
+        <a href="/blog" class="hover:text-foreground transition-colors">Blog</a>
+      </div>
+      <p class="text-center mt-4 opacity-80">
+        © 2023 ResizedImage.com — All rights reserved
+      </p>
+    </footer>
   </div>
-</nav>
-  </nav>
-
-  <header class="text-center py-16">
-    <h1 class="text-3xl font-bold">ResizedImage</h1>
-    <p class="text-xl mt-4">Resize images effortlessly for free</p>
-  </header>
-
-  <main class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="bg-gray-800 p-8 rounded-lg text-center">
-        <i class="fas fa-image text-5xl mb-4"></i>
-        <h3 class="text-2xl font-bold mb-4">Single Image Upload</h3>
-        <p class="mb-4">or</p>
-        <button id="upload-single" class="bg-blue-600 px-6 py-3 rounded-lg"><i class="fas fa-folder-open"></i> Browse File</button>
-        <p class="mt-4 text-sm text-gray-400">Supports: JPG, PNG, WEBP (Max 10MB)</p>
-      </div>
-      <div class="bg-gray-800 p-8 rounded-lg text-center">
-        <div class="relative">
-          <i class="fas fa-rocket text-5xl mb-4"></i>
-          <span class="absolute top-0 right-0 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">PRO</span>
-        </div>
-        <h3 class="text-2xl font-bold mb-4">$2.00 PRO Batch Upload</h3>
-        <p class="mb-4">Unlock for Lifetime access to all PRO features and future website tools. Your support truly means the world to us 😊</p>
-        <p class="mb-4">or</p>
-        <button id="upload-batch" class="bg-blue-600 px-6 py-3 rounded-lg"><i class="fas fa-folder-open"></i> Browse Files</button>
-        <p class="mt-4 text-sm text-gray-400">Supports: JPG, PNG, WEBP (Max 10MB each)</p>
-      </div>
-    </div>
-
-    <section class="py-16">
-      <h2 class="text-4xl font-bold text-center mb-12">Why Use ResizedImage.com?</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <i class="fas fa-bolt text-4xl mb-4"></i>
-          <h3 class="text-2xl font-bold mb-2">Lightning Fast</h3>
-          <p>Resize images in seconds without compromising quality using our optimized algorithms.</p>
-        </div>
-        <div class="text-center">
-          <i class="fas fa-lock text-4xl mb-4"></i>
-          <h3 class="text-2xl font-bold mb-2">Secure & Private</h3>
-          <p>Your images are processed in your browser and never uploaded to our servers.</p>
-        </div>
-        <div class="text-center">
-          <i class="fas fa-sliders-h text-4xl mb-4"></i>
-          <h3 class="text-2xl font-bold mb-2">Advanced Controls</h3>
-          <p>Precise dimension control, quality adjustment, and multiple format options.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="bg-gray-800 mt-16 py-8">
-    <div class="container mx-auto text-center">
-      <div class="mb-4">
-        <a href="#" class="mr-4">Terms</a>
-        <a href="#" class="mr-4">Privacy</a>
-        <a href="#" class="mr-4">Contact</a>
-        <a href="#" class="mr-4">API</a>
-        <a href="/blog">Blog</a>
-      </div>
-      <p>&copy; 2023 ResizedImage.com - All rights reserved</p>
-    </div>
-  </footer>
 
   <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl">
+    <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-6xl">
    <div class="p-8">
    <div class="flex justify-between items-center mb-4">
    <h2 class="text-2xl font-bold">Image Editor</h2>
@@ -264,7 +409,7 @@
   <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
    <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-4xl">
    <div class="p-8">
-   <h2 class="text-2xl font-bold mb-4">Crop Image</h2>
+   <h2 class="text-2xl font-bold">Crop Image</h2>
    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
    <div class="md:col-span-2">
    <div id="crop-preview-panel" class="bg-gray-700 h-96 relative overflow-hidden">
@@ -316,11 +461,13 @@
  <script>
   document.addEventListener('DOMContentLoaded', () => {
    const $=id=>document.getElementById(id);
- 
+  
    const editorModal = $('editor-modal');
    const uploadSingleBtn = $('upload-single');
    const uploadBatchBtn = $('upload-batch');
- 
+   const singleFileInput = $('single-file-input');
+   const batchFileInput = $('batch-file-input');
+  
    async function isPro() {
     try {
     const r = await fetch('/me', { credentials: 'include' });
@@ -329,7 +476,7 @@
     return false;
     }
    }
- 
+  
    async function redeem() {
     const t = new URLSearchParams(location.search).get('token');
     if (!t) return;
@@ -341,84 +488,76 @@
     history.replaceState({}, '', u);
     }
    }
- 
+  
    (async () => {
     await redeem();
     if (await isPro()) {
     $('unlock-pro-btn').style.display = 'none';
     }
    })();
- 
+  
    const unlockProBtn = $('unlock-pro-btn');
    if (unlockProBtn) {
      unlockProBtn.onclick = () => location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
    }
- 
-   uploadSingleBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData,
-    });
-    const json = await res.json();
-    if (json.success) {
-    const previewPanel = $('preview-panel');
-    const img = new Image();
-    img.onload = () => {
-    originalWidth = img.width;
-    originalHeight = img.height;
-    widthInput.value = originalWidth;
-    heightInput.value = originalHeight;
-    percentageSlider.value = 100;
-    percentageValueSpan.textContent = '100%';
-    };
-    img.src = URL.createObjectURL(file);
-    previewPanel.innerHTML = '';
-    previewPanel.appendChild(img);
-    editorModal.classList.remove('hidden');
-    }
-    }
-    };
-    input.click();
-   });
- 
+  
+   uploadSingleBtn.addEventListener('click', () => singleFileInput.click());
    uploadBatchBtn.addEventListener('click', async () => {
-    if (await isPro()) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.multiple = true;
-    input.onchange = (e) => {
-    const files = e.target.files;
-    if (files.length > 0) {
-    editorModal.classList.remove('hidden');
-    }
-    };
-    input.click();
-    } else {
-    location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
-    }
+     if (await isPro()) {
+       batchFileInput.click();
+     } else {
+       location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
+     }
    });
- 
+
+   singleFileInput.addEventListener('change', async (e) => {
+     const file = e.target.files[0];
+     if (file) {
+       const formData = new FormData();
+       formData.append('file', file);
+       const res = await fetch('/api/upload', {
+         method: 'POST',
+         body: formData,
+       });
+       const json = await res.json();
+       if (json.success) {
+         const previewPanel = $('preview-panel');
+         const img = new Image();
+         img.onload = () => {
+           originalWidth = img.width;
+           originalHeight = img.height;
+           widthInput.value = originalWidth;
+           heightInput.value = originalHeight;
+           percentageSlider.value = 100;
+           percentageValueSpan.textContent = '100%';
+         };
+         img.src = URL.createObjectURL(file);
+         previewPanel.innerHTML = '';
+         previewPanel.appendChild(img);
+         editorModal.classList.remove('hidden');
+       }
+     }
+   });
+
+   batchFileInput.addEventListener('change', (e) => {
+     const files = e.target.files;
+     if (files.length > 0) {
+       editorModal.classList.remove('hidden');
+     }
+   });
+  
    const widthInput = $('width');
    const heightInput = $('height');
    const lockAspectCheckbox = $('lock-aspect');
    let originalWidth, originalHeight;
- 
+  
    function handleResize() {
     if (!originalWidth || !originalHeight) return;
- 
+  
     const aspectRatio = originalWidth / originalHeight;
     const width = parseInt(widthInput.value);
     const height = parseInt(heightInput.value);
- 
+  
     if (lockAspectCheckbox.checked) {
     if (document.activeElement === widthInput) {
     heightInput.value = Math.round(width / aspectRatio);
@@ -427,42 +566,42 @@
     }
     }
    }
- 
+  
    widthInput.addEventListener('input', handleResize);
    heightInput.addEventListener('input', handleResize);
- 
+  
    const percentageSlider = $('percentage-slider');
    const percentageValueSpan = $('percentage-value');
-   const unitsSelect = $('units');
- 
+   const unitsSelect = $('as-percentage-units');
+  
    function updatePercentageResize() {
     if (!originalWidth || !originalHeight) return;
- 
+  
     const percentage = parseInt(percentageSlider.value);
     percentageValueSpan.textContent = `${percentage}%`;
- 
+  
     const newWidth = Math.round(originalWidth * (percentage / 100));
     const newHeight = Math.round(originalHeight * (percentage / 100));
- 
+  
     widthInput.value = newWidth;
     heightInput.value = newHeight;
    }
- 
+  
    percentageSlider.addEventListener('input', updatePercentageResize);
    unitsSelect.addEventListener('change', () => {
     // For now, just update the display, actual unit conversion will happen on the backend
     console.log(`Selected unit: ${unitsSelect.value}`);
    });
- 
+  
    // Update originalWidth and originalHeight when a new image is loaded
    // This part needs to be integrated into the single upload onchange handler
    // I will modify the single upload onchange handler to include this.
- 
+  
    const socialPlatformSelect = $('social-platform');
    const socialPresetSelect = $('social-preset');
- 
+  
    let socialPresets = {};
- 
+  
    async function loadSocialPresets() {
     const res = await fetch('/socialPresets.json');
     socialPresets = await res.json();
@@ -473,7 +612,7 @@
     socialPlatformSelect.appendChild(option);
     }
    }
- 
+  
    socialPlatformSelect.addEventListener('change', () => {
     const platform = socialPlatformSelect.value;
     socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
@@ -489,7 +628,7 @@
     socialPresetSelect.disabled = true;
     }
    });
- 
+  
    socialPresetSelect.addEventListener('change', () => {
     const platform = socialPlatformSelect.value;
     const preset = socialPresetSelect.value;
@@ -499,22 +638,22 @@
     heightInput.value = height;
     }
    });
- 
+  
    loadSocialPresets();
- 
+  
    const exportBtn = $('export-btn');
- 
+  
    exportBtn.addEventListener('click', async () => {
     const image = $('preview-panel').querySelector('img');
     if (!image || !image.src) {
       alert('Please upload an image first.');
       return;
     }
- 
+  
     let fileBlob;
     let endpoint = '/process';
     const form = new FormData();
- 
+  
     if (cropper) {
       const cropData = cropper.getData(true);
       form.append('cropData', JSON.stringify(cropData));
@@ -525,7 +664,7 @@
     } else {
       fileBlob = await (await fetch(image.src)).blob();
     }
- 
+  
     form.append('file', fileBlob);
     if ($('background-fill').checked) {
       form.append('backgroundColor', $('background-color').value);
@@ -537,12 +676,12 @@
     form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
     form.append('targetSize', $('target-size').value);
     form.append('targetSizeUnit', $('target-size-unit').value);
- 
+  
     const res = await fetch(endpoint, {
       method: 'POST',
       body: form,
     });
- 
+  
     if (res.ok) {
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -556,7 +695,7 @@
       alert('An error occurred during processing.');
     }
    });
- 
+  
    const cropBtn = $('crop-btn');
    const cropModal = $('crop-modal');
    const cropPreviewPanel = $('crop-preview-panel');
@@ -567,7 +706,7 @@
    const cropHeightInput = $('crop-height');
    let cropper;
    let currentImageSrc = '';
- 
+  
    cropBtn.addEventListener('click', () => {
     const image = $('preview-panel').querySelector('img');
     if (!image) {
@@ -577,9 +716,9 @@
     currentImageSrc = image.src;
     cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%; max-height: 100%;">`;
     const cropImage = cropPreviewPanel.querySelector('img');
-
+  
     cropModal.classList.remove('hidden');
-
+  
     if (cropper) {
       cropper.destroy();
     }
@@ -593,7 +732,7 @@
       },
     });
    });
- 
+  
    applyCropBtn.addEventListener('click', () => {
     if (cropper) {
       const croppedCanvas = cropper.getCroppedCanvas();
@@ -604,13 +743,13 @@
       cropModal.classList.add('hidden');
     }
    });
- 
+  
    resetCropBtn.addEventListener('click', () => {
     if (cropper) {
     cropper.reset();
     }
    });
- 
+  
    aspectRatioSelect.addEventListener('change', () => {
     if (cropper) {
       const aspectRatio = aspectRatioSelect.value;
@@ -628,10 +767,10 @@
       }
     }
    });
- 
+  
    const rotateLeftBtn = $('rotate-left-btn');
    const rotateRightBtn = $('rotate-right-btn');
- 
+  
    rotateLeftBtn.addEventListener('click', () => {
      const image = $('preview-panel').querySelector('img');
      if (image) {
@@ -645,7 +784,7 @@
        image.src = canvas.toDataURL();
      }
    });
- 
+  
    rotateRightBtn.addEventListener('click', () => {
      const image = $('preview-panel').querySelector('img');
      if (image) {
@@ -659,14 +798,380 @@
        image.src = canvas.toDataURL();
      }
    });
-  });
-
-  const hamburgerButton = $('hamburger-button');
-  const mobileMenu = $('mobile-menu');
-
-  hamburgerButton.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
+   const hamburgerButton = $('hamburger-button');
+   const mobileMenu = $('mobile-menu');
+  
+   hamburgerButton.addEventListener('click', () => {
+     mobileMenu.classList.toggle('hidden');
+   });
   });
  </script>
+</body>
+</html>
+
+  <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = id => document.getElementById(id);
+
+      const editorModal = $('editor-modal');
+      const uploadSingleBtn = $('upload-single');
+      const uploadBatchBtn = $('upload-batch');
+      const singleFileInput = $('single-file-input');
+      const batchFileInput = $('batch-file-input');
+      const errorDisplay = $('error-display');
+
+      async function isPro() {
+        try {
+          const r = await fetch('/me', { credentials: 'include' });
+          return (await r.json()).pro;
+        } catch {
+          return false;
+        }
+      }
+
+      async function redeem() {
+        const t = new URLSearchParams(location.search).get('token');
+        if (!t) return;
+        const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
+        const j = await r.json();
+        if (j.ok) {
+          const u = new URL(location.href);
+          u.searchParams.delete('token');
+          history.replaceState({}, '', u);
+        }
+      }
+
+      (async () => {
+        await redeem();
+        if (await isPro()) {
+          // Assuming there's an element with id 'unlock-pro-btn' in the new design
+          const unlockProBtn = $('unlock-pro-btn');
+          if (unlockProBtn) {
+            unlockProBtn.style.display = 'none';
+          }
+        }
+      })();
+
+      // Event listeners for upload buttons
+      uploadSingleBtn.addEventListener('click', () => singleFileInput.click());
+      uploadBatchBtn.addEventListener('click', async () => {
+        if (await isPro()) {
+          batchFileInput.click();
+        } else {
+          location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
+        }
+      });
+
+      // Event listener for single file input change
+      singleFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append('file', file);
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          const json = await res.json();
+          if (json.success) {
+            const previewPanel = $('preview-panel');
+            const img = new Image();
+            img.onload = () => {
+              originalWidth = img.width;
+              originalHeight = img.height;
+              widthInput.value = originalWidth;
+              heightInput.value = originalHeight;
+              percentageSlider.value = 100;
+              percentageValueSpan.textContent = '100%';
+            };
+            img.src = URL.createObjectURL(file);
+            previewPanel.innerHTML = '';
+            previewPanel.appendChild(img);
+            editorModal.classList.remove('hidden');
+          } else {
+            errorDisplay.textContent = json.error || 'File upload failed.';
+            errorDisplay.classList.remove('hidden');
+          }
+        }
+      });
+
+      // Event listener for batch file input change
+      batchFileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+          editorModal.classList.remove('hidden');
+        }
+      });
+
+      const widthInput = $('width');
+      const heightInput = $('height');
+      const lockAspectCheckbox = $('lock-aspect');
+      let originalWidth, originalHeight;
+
+      function handleResize() {
+        if (!originalWidth || !originalHeight) return;
+
+        const aspectRatio = originalWidth / originalHeight;
+        const width = parseInt(widthInput.value);
+        const height = parseInt(heightInput.value);
+
+        if (lockAspectCheckbox.checked) {
+          if (document.activeElement === widthInput) {
+            heightInput.value = Math.round(width / aspectRatio);
+          } else {
+            widthInput.value = Math.round(height * aspectRatio);
+          }
+        }
+      }
+
+      widthInput.addEventListener('input', handleResize);
+      heightInput.addEventListener('input', handleResize);
+
+      const percentageSlider = $('percentage-slider');
+      const percentageValueSpan = $('percentage-value');
+      const unitsSelect = $('as-percentage-units'); // Corrected ID
+
+      function updatePercentageResize() {
+        if (!originalWidth || !originalHeight) return;
+
+        const percentage = parseInt(percentageSlider.value);
+        percentageValueSpan.textContent = `${percentage}%`;
+
+        const newWidth = Math.round(originalWidth * (percentage / 100));
+        const newHeight = Math.round(originalHeight * (percentage / 100));
+
+        widthInput.value = newWidth;
+        heightInput.value = newHeight;
+      }
+
+      percentageSlider.addEventListener('input', updatePercentageResize);
+      unitsSelect.addEventListener('change', () => {
+        console.log(`Selected unit: ${unitsSelect.value}`);
+      });
+
+      const socialPlatformSelect = $('social-platform');
+      const socialPresetSelect = $('social-preset');
+
+      let socialPresets = {};
+
+      async function loadSocialPresets() {
+        const res = await fetch('/socialPresets.json');
+        socialPresets = await res.json();
+        for (const platform in socialPresets) {
+          const option = document.createElement('option');
+          option.value = platform;
+          option.textContent = platform;
+          socialPlatformSelect.appendChild(option);
+        }
+      }
+
+      socialPlatformSelect.addEventListener('change', () => {
+        const platform = socialPlatformSelect.value;
+        socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
+        if (platform) {
+          socialPresetSelect.disabled = false;
+          for (const preset in socialPresets[platform]) {
+            const option = document.createElement('option');
+            option.value = preset;
+            option.textContent = preset;
+            socialPresetSelect.appendChild(option);
+          }
+        } else {
+          socialPresetSelect.disabled = true;
+        }
+      });
+
+      socialPresetSelect.addEventListener('change', () => {
+        const platform = socialPlatformSelect.value;
+        const preset = socialPresetSelect.value;
+        if (platform && preset) {
+          const { width, height } = socialPresets[platform][preset];
+          widthInput.value = width;
+          heightInput.value = height;
+        }
+      });
+
+      loadSocialPresets();
+
+      const exportBtn = $('export-btn');
+
+      exportBtn.addEventListener('click', async () => {
+        const image = $('preview-panel').querySelector('img');
+        if (!image || !image.src) {
+          alert('Please upload an image first.');
+          return;
+        }
+
+        let fileBlob;
+        let endpoint = '/process';
+        const form = new FormData();
+
+        if (cropper) {
+          const cropData = cropper.getData(true);
+          form.append('cropData', JSON.stringify(cropData));
+          endpoint = '/process-crop';
+          fileBlob = await new Promise(resolve => {
+            cropper.getCroppedCanvas().toBlob(resolve);
+          });
+        } else {
+          fileBlob = await (await fetch(image.src)).blob();
+        }
+
+        form.append('file', fileBlob);
+        if ($('background-fill').checked) {
+          form.append('backgroundColor', $('background-color').value);
+        }
+        form.append('w', widthInput.value);
+        form.append('h', heightInput.value);
+        form.append('fmt', $('format').value);
+        form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
+        form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
+        form.append('targetSize', $('target-size').value);
+        form.append('targetSizeUnit', $('target-size-unit').value);
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          body: form,
+        });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `resized.${$('format').value}`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else {
+          alert('An error occurred during processing.');
+        }
+      });
+
+      const cropBtn = $('crop-btn');
+      const cropModal = $('crop-modal');
+      const cropPreviewPanel = $('crop-preview-panel');
+      const applyCropBtn = $('apply-crop-btn');
+      const resetCropBtn = $('reset-crop-btn');
+      const aspectRatioSelect = $('aspect-ratio');
+      const cropWidthInput = $('crop-width');
+      const cropHeightInput = $('crop-height');
+      let cropper;
+      let currentImageSrc = '';
+
+      cropBtn.addEventListener('click', () => {
+        const image = $('preview-panel').querySelector('img');
+        if (!image) {
+          alert('Please upload an image first.');
+          return;
+        }
+        currentImageSrc = image.src;
+        cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%; max-height: 100%;">`;
+        const cropImage = cropPreviewPanel.querySelector('img');
+
+        cropModal.classList.remove('hidden');
+
+        if (cropper) {
+          cropper.destroy();
+        }
+        cropper = new Cropper(cropImage, {
+          viewMode: 1,
+          autoCropArea: 1,
+          background: false,
+          crop(event) {
+            cropWidthInput.value = Math.round(event.detail.width);
+            cropHeightInput.value = Math.round(event.detail.height);
+          },
+        });
+      });
+
+      applyCropBtn.addEventListener('click', () => {
+        if (cropper) {
+          const croppedCanvas = cropper.getCroppedCanvas();
+          const image = $('preview-panel').querySelector('img');
+          image.src = croppedCanvas.toDataURL();
+          cropper.destroy();
+          cropper = null;
+          cropModal.classList.add('hidden');
+        }
+      });
+
+      resetCropBtn.addEventListener('click', () => {
+        if (cropper) {
+          cropper.reset();
+        }
+      });
+
+      aspectRatioSelect.addEventListener('change', () => {
+        if (cropper) {
+          const aspectRatio = aspectRatioSelect.value;
+          if (aspectRatio === 'free') {
+            cropper.setAspectRatio(NaN);
+          } else if (aspectRatio === 'original') {
+            const cropImage = cropPreviewPanel.querySelector('img');
+            if (cropImage) {
+              cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
+            }
+          } else {
+            const [w, h] = aspectRatio.split(':');
+            cropper.setAspectRatio(w / h);
+          }
+        }
+      });
+
+      const rotateLeftBtn = $('rotate-left-btn');
+      const rotateRightBtn = $('rotate-right-btn');
+
+      rotateLeftBtn.addEventListener('click', () => {
+        const image = $('preview-panel').querySelector('img');
+        if (image) {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = image.height;
+          canvas.height = image.width;
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.drawImage(image, -image.width / 2, -image.height / 2);
+          image.src = canvas.toDataURL();
+        }
+      });
+
+      rotateRightBtn.addEventListener('click', () => {
+        const image = $('preview-panel').querySelector('img');
+        if (image) {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = image.height;
+          canvas.height = image.width;
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate(Math.PI / 2);
+          ctx.drawImage(image, -image.width / 2, -image.height / 2);
+          image.src = canvas.toDataURL();
+        }
+      });
+
+      const hamburgerButton = $('hamburger-button');
+      const mobileMenu = $('mobile-menu');
+
+      hamburgerButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      // Tab functionality for editor modal
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+          tabContents.forEach(content => content.classList.add('hidden'));
+
+          button.classList.add('active-tab');
+          $(`${button.dataset.tab}`).classList.remove('hidden');
+        });
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,184 @@
+/* ResizedImage.com Glassmorphic Design System
+   All colors MUST be HSL for consistent theming
+*/
+:root {
+  /* Base Colors - Dark glassmorphic theme */
+  --background: 220 17% 7%;
+  --foreground: 210 40% 98%;
+
+  /* Glassmorphic card system */
+  --card: 220 17% 7%;
+  --card-foreground: 210 40% 98%;
+  --glass-card: 0 0% 100%;
+  --glass-border: 0 0% 100%;
+
+  /* Primary - Blue/Indigo system */
+  --primary: 217 100% 64%;
+  --primary-foreground: 220 17% 7%;
+  --primary-glow: 225 100% 72%;
+
+  /* Secondary glassmorphic elements */
+  --secondary: 0 0% 100%;
+  --secondary-foreground: 220 17% 7%;
+
+  /* Muted elements */
+  --muted: 220 13% 15%;
+  --muted-foreground: 210 20% 70%;
+
+  /* Accent colors */
+  --accent: 51 100% 68%;
+  --accent-foreground: 220 17% 7%;
+
+  /* Status colors */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+
+  /* Interactive elements */
+  --border: 0 0% 100%;
+  --input: 220 13% 15%;
+  --ring: 217 100% 64%;
+
+  /* Design tokens */
+  --radius: 0.75rem;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  --gradient-bg: radial-gradient(1600px 1200px at 20% 15%, rgba(118,142,255,0.25) 0%, transparent 65%),
+                 radial-gradient(1400px 1000px at 80% 85%, rgba(255,179,120,0.28) 0%, transparent 70%),
+                 radial-gradient(800px 600px at 50% 50%, rgba(255,179,120,0.15) 0%, transparent 60%);
+
+  /* Shadows and effects */
+  --shadow-glass: 0 10px 40px rgba(0,0,0,0.25);
+  --shadow-glow: 0 0 40px hsl(var(--primary) / 0.4);
+  --backdrop-blur: blur(12px);
+
+  /* Animations */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-float: float 6s ease-in-out infinite;
+}
+
+.dark {
+  /* Dark mode uses the same glassmorphic values */
+  --background: 220 17% 7%;
+  --foreground: 210 40% 98%;
+  --card: 220 17% 7%;
+  --card-foreground: 210 40% 98%;
+  --primary: 217 100% 64%;
+  --primary-foreground: 220 17% 7%;
+  --secondary: 0 0% 100%;
+  --secondary-foreground: 220 17% 7%;
+  --muted: 220 13% 15%;
+  --muted-foreground: 210 20% 70%;
+  --accent: 51 100% 68%;
+  --accent-foreground: 220 17% 7%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 0 0% 100%;
+  --input: 220 13% 15%;
+  --ring: 217 100% 64%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Glassmorphic utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Background animations */
+@keyframes bgShift {
+  0% { transform: translate3d(0,0,0); }
+  50% { transform: translate3d(-2%,1%,0); }
+  100% { transform: translate3d(0,0,0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.bg-animated {
+  background: var(--gradient-bg);
+  background-size: 120% 120%;
+  animation: bgShift 28s linear infinite;
+}
+
+/* Existing styles for modals and inputs */
+#preview-panel img, #crop-preview-panel img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.editor-modal-button {
+  background-color: #4a5568; /* A darker gray for contrast */
+  color: white;
+}
+.editor-modal-button:hover {
+  background-color: #2d3748;
+}
+.tab-btn {
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid transparent;
+  color: #a0aec0; /* Light gray for inactive tabs */
+}
+.tab-btn.active-tab {
+  border-color: #667eea; /* Blue for active tab */
+  color: white;
+}
+.tab-btn:hover {
+  color: white;
+}
+/* Ensure cropper is visible and centered */
+.cropper-container {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: auto;
+}
+/* Adjust modal background for better visibility */
+#editor-modal .bg-white, #crop-modal .bg-white {
+  background-color: #2d3748; /* Darker background for modals */
+  color: white;
+}
+/* Adjust input field styles for visibility */
+.border-gray-300 {
+  border-color: #4a5568;
+}
+.bg-gray-200 {
+  background-color: #4a5568;
+}
+#editor-modal {
+  z-index: 1000; /* Ensure editor modal is above other content */
+}
+#crop-modal {
+  z-index: 1010; /* Ensure crop modal is above editor modal */
+}

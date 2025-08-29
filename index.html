@@ -6,6 +6,51 @@
   <title>ResizedImage.com</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    #preview-panel img, #crop-preview-panel img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .editor-modal-button {
+      background-color: #4a5568; /* A darker gray for contrast */
+      color: white;
+    }
+    .editor-modal-button:hover {
+      background-color: #2d3748;
+    }
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      border-bottom: 2px solid transparent;
+      color: #a0aec0; /* Light gray for inactive tabs */
+    }
+    .tab-btn.active-tab {
+      border-color: #667eea; /* Blue for active tab */
+      color: white;
+    }
+    .tab-btn:hover {
+      color: white;
+    }
+    /* Ensure cropper is visible and centered */
+    .cropper-container {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+      margin: auto;
+    }
+    /* Adjust modal background for better visibility */
+    #editor-modal .bg-white, #crop-modal .bg-white {
+      background-color: #2d3748; /* Darker background for modals */
+      color: white;
+    }
+    /* Adjust input field styles for visibility */
+    .border-gray-300 {
+      border-color: #4a5568;
+    }
+    .bg-gray-200 {
+      background-color: #4a5568;
+    }
+  </style>
 </head>
 <body class="text-white" style="background: linear-gradient(to right, #1a202c, #2d3748);">
 
@@ -107,20 +152,20 @@
    <div class="flex justify-between items-center mb-4">
    <h2 class="text-2xl font-bold">Image Editor</h2>
    <div>
-   <button id="rotate-left-btn" class="p-2 rounded-full hover:bg-gray-200">
+   <button id="rotate-left-btn" class="editor-modal-button p-2 rounded-full text-white">
    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
    </button>
-   <button id="rotate-right-btn" class="p-2 rounded-full hover:bg-gray-200">
+   <button id="rotate-right-btn" class="editor-modal-button p-2 rounded-full text-white">
    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
    </button>
-   <button id="crop-btn" class="p-2 rounded-full hover:bg-gray-200">
+   <button id="crop-btn" class="editor-modal-button p-2 rounded-full text-white">
    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
    </button>
    </div>
    </div>
    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
    <div class="md:col-span-2">
-   <div id="preview-panel" class="bg-gray-200 h-96 flex items-center justify-center">
+   <div id="preview-panel" class="bg-gray-700 h-96 flex items-center justify-center relative overflow-hidden">
    <p>Image Preview</p>
    </div>
    </div>
@@ -135,11 +180,11 @@
    <div id="by-size" class="tab-content">
    <div class="flex items-center mb-4">
    <label for="width" class="w-16">Width:</label>
-   <input type="number" id="width" class="w-24 border border-gray-300 rounded px-2 py-1">
+   <input type="number" id="width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    </div>
    <div class="flex items-center mb-4">
    <label for="height" class="w-16">Height:</label>
-   <input type="number" id="height" class="w-24 border border-gray-300 rounded px-2 py-1">
+   <input type="number" id="height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    </div>
    <div class="flex items-center">
    <input type="checkbox" id="lock-aspect" class="mr-2" checked>
@@ -153,7 +198,7 @@
    </div>
    <div class="flex items-center mt-4">
    <label for="as-percentage-units" class="mr-2">Units:</label>
-   <select id="as-percentage-units" class="border border-gray-300 rounded px-2 py-1">
+   <select id="as-percentage-units" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    <option value="px">Pixels</option>
    <option value="in">Inches</option>
    <option value="cm">Centimeters</option>
@@ -169,13 +214,13 @@
    <div id="social-media" class="tab-content hidden">
    <div class="flex items-center mb-4">
    <label for="social-platform" class="mr-2">Platform:</label>
-   <select id="social-platform" class="border border-gray-300 rounded px-2 py-1 w-full">
+   <select id="social-platform" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white">
    <option value="">Select Platform</option>
    </select>
    </div>
    <div class="flex items-center mb-4">
    <label for="social-preset" class="mr-2">Preset:</label>
-   <select id="social-preset" class="border border-gray-300 rounded px-2 py-1 w-full" disabled>
+   <select id="social-preset" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white" disabled>
    <option value="">Select Preset</option>
    </select>
    </div>
@@ -184,15 +229,15 @@
    <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
    <div class="flex items-center mb-4">
    <label for="target-size" class="mr-2">Target File Size (optional):</label>
-   <input type="number" id="target-size" class="w-24 border border-gray-300 rounded px-2 py-1">
-   <select id="target-size-unit" class="border border-gray-300 rounded px-2 py-1 ml-2">
+   <input type="number" id="target-size" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+   <select id="target-size-unit" class="border border-gray-600 rounded px-2 py-1 ml-2 bg-gray-800 text-white">
    <option value="KB">KB</option>
    <option value="MB">MB</option>
    </select>
    </div>
    <div class="flex items-center mb-4">
    <label for="format" class="mr-2">Save Image As:</label>
-   <select id="format" class="border border-gray-300 rounded px-2 py-1">
+   <select id="format" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    <option value="original">Original</option>
    <option value="jpeg">JPEG</option>
    <option value="png">PNG</option>
@@ -209,27 +254,27 @@
    </div>
   </div>
   <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-   <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl">
+   <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-4xl">
    <div class="p-8">
    <h2 class="text-2xl font-bold mb-4">Crop Image</h2>
    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
    <div class="md:col-span-2">
-   <div id="crop-preview-panel" class="bg-gray-200 h-96">
+   <div id="crop-preview-panel" class="bg-gray-700 h-96 relative overflow-hidden">
    </div>
    </div>
    <div>
    <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
    <div class="flex items-center mb-4">
    <label for="crop-width" class="w-16">Width:</label>
-   <input type="number" id="crop-width" class="w-24 border border-gray-300 rounded px-2 py-1">
+   <input type="number" id="crop-width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    </div>
    <div class="flex items-center mb-4">
    <label for="crop-height" class="w-16">Height:</label>
-   <input type="number" id="crop-height" class="w-24 border border-gray-300 rounded px-2 py-1">
+   <input type="number" id="crop-height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    </div>
    <div class="flex items-center mb-4">
    <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
-   <select id="aspect-ratio" class="border border-gray-300 rounded px-2 py-1">
+   <select id="aspect-ratio" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
    <option value="free">Freeform</option>
    <option value="original">Original</option>
    <option value="custom">Custom</option>
@@ -248,10 +293,10 @@
    <option value="32:9">32:9 (Super Ultra Wide)</option>
    </select>
    </div>
-   <button id="apply-crop-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full mb-2">
+   <button id="apply-crop-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-2">
    Crop
    </button>
-   <button id="reset-crop-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full">
+   <button id="reset-crop-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full">
    Reset
    </button>
    </div>

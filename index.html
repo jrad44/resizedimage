@@ -1,558 +1,590 @@
-<!doctype html><meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ResizedImage</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
- <style>
-  body {
-  font-family: system-ui;
-  }
-  #preview-panel img, #crop-preview-panel img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
- </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResizedImage.com</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-gray-100 text-gray-800">
- <header class="bg-white shadow-md">
-  <nav class="container mx-auto px-6 py-3">
-  <div class="flex items-center justify-between">
-  <div class="text-xl font-semibold text-gray-700">
-  <a href="/" class="text-gray-800 hover:text-gray-700">ResizedImage</a>
-  </div>
-  <div class="flex items-center">
-  <a href="#" class="text-gray-600 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Image Resizer</a>
-  <a href="#" class="text-gray-600 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">PDF Merger</a>
-  <a href="#" class="text-gray-600 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Image Background Remover</a>
-  </div>
-  </div>
+<body class="bg-gray-900 text-white">
+
+  <nav class="bg-gray-800 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold">ResizedImage.com</a>
+      <div>
+        <a href="/login" class="mr-4">Login</a>
+        <a href="/signup" class="mr-4">Sign Up</a>
+        <a href="/pro" class="bg-purple-600 px-4 py-2 rounded">Unlock Pro $2</a>
+      </div>
+    </div>
   </nav>
- </header>
- <main class="container mx-auto px-6 py-8">
-  <div class="max-w-4xl mx-auto">
-  <div class="bg-white rounded-lg shadow-md p-8">
-  <h1 class="text-3xl font-bold text-center mb-4">Image Resizer</h1>
-  <p class="text-center text-gray-600 mb-8">Resize images for free. Upgrade to Pro for batch processing.</p>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-  <div class="border border-gray-200 rounded-lg p-6 text-center">
-  <h2 class="text-xl font-semibold mb-4">Single Image (Free)</h2>
-  <p class="text-gray-600 mb-4">Max file size: 10MB</p>
-  <button id="upload-single" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-  Select Image
-  </button>
-  </div>
-  <div class="border border-gray-200 rounded-lg p-6 text-center">
-  <h2 class="text-xl font-semibold mb-4">Batch Upload (Pro)</h2>
-  <p class="text-gray-600 mb-4">Unlock with a $2 lifetime purchase</p>
-  <button id="upload-batch" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded">
-  Select Images
-  </button>
-  </div>
-  </div>
-  </div>
-  </div>
- </main>
- <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-  <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl">
-  <div class="p-8">
-  <div class="flex justify-between items-center mb-4">
-  <h2 class="text-2xl font-bold">Image Editor</h2>
-  <div>
-  <button id="rotate-left-btn" class="p-2 rounded-full hover:bg-gray-200">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
-  </button>
-  <button id="rotate-right-btn" class="p-2 rounded-full hover:bg-gray-200">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
-  </button>
-  <button id="crop-btn" class="p-2 rounded-full hover:bg-gray-200">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
-  </button>
-  </div>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-  <div class="md:col-span-2">
-  <div id="preview-panel" class="bg-gray-200 h-96 flex items-center justify-center">
-  <p>Image Preview</p>
-  </div>
-  </div>
-  <div>
-  <div class="mb-4">
-  <div class="flex border-b">
-  <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
-  <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
-  <button class="tab-btn" data-tab="social-media">Social Media</button>
-  </div>
-  </div>
-  <div id="by-size" class="tab-content">
-  <div class="flex items-center mb-4">
-  <label for="width" class="w-16">Width:</label>
-  <input type="number" id="width" class="w-24 border border-gray-300 rounded px-2 py-1">
-  </div>
-  <div class="flex items-center mb-4">
-  <label for="height" class="w-16">Height:</label>
-  <input type="number" id="height" class="w-24 border border-gray-300 rounded px-2 py-1">
-  </div>
-  <div class="flex items-center">
-  <input type="checkbox" id="lock-aspect" class="mr-2" checked>
-  <label for="lock-aspect">Lock aspect ratio</label>
-  </div>
-  <div class="flex items-center mt-4">
-  <input type="checkbox" id="background-fill" class="mr-2">
-  <label for="background-fill">Background Fill</label>
-  <input type="color" id="background-color" class="ml-2" value="#ffffff">
-  </div>
-  </div>
-  <div class="flex items-center mt-4">
-  <label for="as-percentage-units" class="mr-2">Units:</label>
-  <select id="as-percentage-units" class="border border-gray-300 rounded px-2 py-1">
-  <option value="px">Pixels</option>
-  <option value="in">Inches</option>
-  <option value="cm">Centimeters</option>
-  <option value="mm">Millimeters</option>
-  </select>
-  </div>
-  <div id="as-percentage" class="tab-content hidden">
-  <div class="flex items-center mb-4">
-  <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
-  <span id="percentage-value">100%</span>
-  </div>
-  </div>
-  <div id="social-media" class="tab-content hidden">
-  <div class="flex items-center mb-4">
-  <label for="social-platform" class="mr-2">Platform:</label>
-  <select id="social-platform" class="border border-gray-300 rounded px-2 py-1 w-full">
-  <option value="">Select Platform</option>
-  </select>
-  </div>
-  <div class="flex items-center mb-4">
-  <label for="social-preset" class="mr-2">Preset:</label>
-  <select id="social-preset" class="border border-gray-300 rounded px-2 py-1 w-full" disabled>
-  <option value="">Select Preset</option>
-  </select>
-  </div>
-  </div>
-  <div class="mt-8">
-  <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
-  <div class="flex items-center mb-4">
-  <label for="target-size" class="mr-2">Target File Size (optional):</label>
-  <input type="number" id="target-size" class="w-24 border border-gray-300 rounded px-2 py-1">
-  <select id="target-size-unit" class="border border-gray-300 rounded px-2 py-1 ml-2">
-  <option value="KB">KB</option>
-  <option value="MB">MB</option>
-  </select>
-  </div>
-  <div class="flex items-center mb-4">
-  <label for="format" class="mr-2">Save Image As:</label>
-  <select id="format" class="border border-gray-300 rounded px-2 py-1">
-  <option value="original">Original</option>
-  <option value="jpeg">JPEG</option>
-  <option value="png">PNG</option>
-  <option value="webp">WebP</option>
-  </select>
-  </div>
-  <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">
-  Export
-  </button>
-  </div>
-  </div>
-  </div>
-  </div>
-  </div>
- </div>
- <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-  <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl">
-  <div class="p-8">
-  <h2 class="text-2xl font-bold mb-4">Crop Image</h2>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-  <div class="md:col-span-2">
-  <div id="crop-preview-panel" class="bg-gray-200 h-96">
-  </div>
-  </div>
-  <div>
-  <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
-  <div class="flex items-center mb-4">
-  <label for="crop-width" class="w-16">Width:</label>
-  <input type="number" id="crop-width" class="w-24 border border-gray-300 rounded px-2 py-1">
-  </div>
-  <div class="flex items-center mb-4">
-  <label for="crop-height" class="w-16">Height:</label>
-  <input type="number" id="crop-height" class="w-24 border border-gray-300 rounded px-2 py-1">
-  </div>
-  <div class="flex items-center mb-4">
-  <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
-  <select id="aspect-ratio" class="border border-gray-300 rounded px-2 py-1">
-  <option value="free">Freeform</option>
-  <option value="original">Original</option>
-  <option value="custom">Custom</option>
-  <option value="1:1">1:1 (Square)</option>
-  <option value="4:3">4:3 (Monitor)</option>
-  <option value="16:9">16:9 (Widescreen)</option>
-  <option value="16:10">16:10</option>
-  <option value="3:2">3:2</option>
-  <option value="5:4">5:4</option>
-  <option value="2:1">2:1</option>
-  <option value="3:1">3:1</option>
-  <option value="4:1">4:1</option>
-  <option value="14:9">14:9</option>
-  <option value="19:10">19:10</option>
-  <option value="21:9">21:9 (Cinemascope)</option>
-  <option value="32:9">32:9 (Super Ultra Wide)</option>
-  </select>
-  </div>
-  <button id="apply-crop-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full mb-2">
-  Crop
-  </button>
-  <button id="reset-crop-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full">
-  Reset
-  </button>
-  </div>
-  </div>
-  </div>
-  </div>
- </div>
-<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
-<script>
- document.addEventListener('DOMContentLoaded', () => {
-  const $=id=>document.getElementById(id);
 
-  const editorModal = $('editor-modal');
-  const uploadSingleBtn = $('upload-single');
-  const uploadBatchBtn = $('upload-batch');
+  <header class="text-center py-16">
+    <h1 class="text-5xl font-bold">ResizedImage.com</h1>
+    <p class="text-xl mt-4">Free online tool to resize your images while maintaining quality</p>
+  </header>
 
-  async function isPro() {
-   try {
-   const r = await fetch('/me', { credentials: 'include' });
-   return (await r.json()).pro;
-   } catch {
-   return false;
+  <main class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="bg-gray-800 p-8 rounded-lg text-center">
+        <i class="fas fa-image text-5xl mb-4"></i>
+        <h3 class="text-2xl font-bold mb-4">Single Image Upload</h3>
+        <p class="mb-4">or</p>
+        <button id="upload-single" class="bg-blue-600 px-6 py-3 rounded-lg"><i class="fas fa-folder-open"></i> Browse File</button>
+        <p class="mt-4 text-sm text-gray-400">Supports: JPG, PNG, WEBP (Max 10MB)</p>
+      </div>
+      <div class="bg-gray-800 p-8 rounded-lg text-center">
+        <div class="relative">
+          <i class="fas fa-rocket text-5xl mb-4"></i>
+          <span class="absolute top-0 right-0 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">PRO</span>
+        </div>
+        <h3 class="text-2xl font-bold mb-4">$2.00 PRO Batch Upload</h3>
+        <p class="mb-4">Unlock for Lifetime access to all PRO features and future website tools. Your support truly means the world to us 😊</p>
+        <p class="mb-4">or</p>
+        <button id="upload-batch" class="bg-blue-600 px-6 py-3 rounded-lg"><i class="fas fa-folder-open"></i> Browse Files</button>
+        <p class="mt-4 text-sm text-gray-400">Supports: JPG, PNG, WEBP (Max 10MB each)</p>
+      </div>
+    </div>
+
+    <section class="py-16">
+      <h2 class="text-4xl font-bold text-center mb-12">Why Use ResizedImage.com?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <i class="fas fa-bolt text-4xl mb-4"></i>
+          <h3 class="text-2xl font-bold mb-2">Lightning Fast</h3>
+          <p>Resize images in seconds without compromising quality using our optimized algorithms.</p>
+        </div>
+        <div class="text-center">
+          <i class="fas fa-lock text-4xl mb-4"></i>
+          <h3 class="text-2xl font-bold mb-2">Secure & Private</h3>
+          <p>Your images are processed in your browser and never uploaded to our servers.</p>
+        </div>
+        <div class="text-center">
+          <i class="fas fa-sliders-h text-4xl mb-4"></i>
+          <h3 class="text-2xl font-bold mb-2">Advanced Controls</h3>
+          <p>Precise dimension control, quality adjustment, and multiple format options.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 mt-16 py-8">
+    <div class="container mx-auto text-center">
+      <div class="mb-4">
+        <a href="#" class="mr-4">Terms</a>
+        <a href="#" class="mr-4">Privacy</a>
+        <a href="#" class="mr-4">Contact</a>
+        <a href="#" class="mr-4">API</a>
+        <a href="/blog">Blog</a>
+      </div>
+      <p>&copy; 2023 ResizedImage.com - All rights reserved</p>
+    </div>
+  </footer>
+
+  <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl">
+   <div class="p-8">
+   <div class="flex justify-between items-center mb-4">
+   <h2 class="text-2xl font-bold">Image Editor</h2>
+   <div>
+   <button id="rotate-left-btn" class="p-2 rounded-full hover:bg-gray-200">
+   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+   </button>
+   <button id="rotate-right-btn" class="p-2 rounded-full hover:bg-gray-200">
+   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+   </button>
+   <button id="crop-btn" class="p-2 rounded-full hover:bg-gray-200">
+   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+   </button>
+   </div>
+   </div>
+   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+   <div class="md:col-span-2">
+   <div id="preview-panel" class="bg-gray-200 h-96 flex items-center justify-center">
+   <p>Image Preview</p>
+   </div>
+   </div>
+   <div>
+   <div class="mb-4">
+   <div class="flex border-b">
+   <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
+   <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
+   <button class="tab-btn" data-tab="social-media">Social Media</button>
+   </div>
+   </div>
+   <div id="by-size" class="tab-content">
+   <div class="flex items-center mb-4">
+   <label for="width" class="w-16">Width:</label>
+   <input type="number" id="width" class="w-24 border border-gray-300 rounded px-2 py-1">
+   </div>
+   <div class="flex items-center mb-4">
+   <label for="height" class="w-16">Height:</label>
+   <input type="number" id="height" class="w-24 border border-gray-300 rounded px-2 py-1">
+   </div>
+   <div class="flex items-center">
+   <input type="checkbox" id="lock-aspect" class="mr-2" checked>
+   <label for="lock-aspect">Lock aspect ratio</label>
+   </div>
+   <div class="flex items-center mt-4">
+   <input type="checkbox" id="background-fill" class="mr-2">
+   <label for="background-fill">Background Fill</label>
+   <input type="color" id="background-color" class="ml-2" value="#ffffff">
+   </div>
+   </div>
+   <div class="flex items-center mt-4">
+   <label for="as-percentage-units" class="mr-2">Units:</label>
+   <select id="as-percentage-units" class="border border-gray-300 rounded px-2 py-1">
+   <option value="px">Pixels</option>
+   <option value="in">Inches</option>
+   <option value="cm">Centimeters</option>
+   <option value="mm">Millimeters</option>
+   </select>
+   </div>
+   <div id="as-percentage" class="tab-content hidden">
+   <div class="flex items-center mb-4">
+   <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
+   <span id="percentage-value">100%</span>
+   </div>
+   </div>
+   <div id="social-media" class="tab-content hidden">
+   <div class="flex items-center mb-4">
+   <label for="social-platform" class="mr-2">Platform:</label>
+   <select id="social-platform" class="border border-gray-300 rounded px-2 py-1 w-full">
+   <option value="">Select Platform</option>
+   </select>
+   </div>
+   <div class="flex items-center mb-4">
+   <label for="social-preset" class="mr-2">Preset:</label>
+   <select id="social-preset" class="border border-gray-300 rounded px-2 py-1 w-full" disabled>
+   <option value="">Select Preset</option>
+   </select>
+   </div>
+   </div>
+   <div class="mt-8">
+   <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
+   <div class="flex items-center mb-4">
+   <label for="target-size" class="mr-2">Target File Size (optional):</label>
+   <input type="number" id="target-size" class="w-24 border border-gray-300 rounded px-2 py-1">
+   <select id="target-size-unit" class="border border-gray-300 rounded px-2 py-1 ml-2">
+   <option value="KB">KB</option>
+   <option value="MB">MB</option>
+   </select>
+   </div>
+   <div class="flex items-center mb-4">
+   <label for="format" class="mr-2">Save Image As:</label>
+   <select id="format" class="border border-gray-300 rounded px-2 py-1">
+   <option value="original">Original</option>
+   <option value="jpeg">JPEG</option>
+   <option value="png">PNG</option>
+   <option value="webp">WebP</option>
+   </select>
+   </div>
+   <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">
+   Export
+   </button>
+   </div>
+   </div>
+   </div>
+   </div>
+   </div>
+  </div>
+  <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+   <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl">
+   <div class="p-8">
+   <h2 class="text-2xl font-bold mb-4">Crop Image</h2>
+   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+   <div class="md:col-span-2">
+   <div id="crop-preview-panel" class="bg-gray-200 h-96">
+   </div>
+   </div>
+   <div>
+   <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
+   <div class="flex items-center mb-4">
+   <label for="crop-width" class="w-16">Width:</label>
+   <input type="number" id="crop-width" class="w-24 border border-gray-300 rounded px-2 py-1">
+   </div>
+   <div class="flex items-center mb-4">
+   <label for="crop-height" class="w-16">Height:</label>
+   <input type="number" id="crop-height" class="w-24 border border-gray-300 rounded px-2 py-1">
+   </div>
+   <div class="flex items-center mb-4">
+   <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
+   <select id="aspect-ratio" class="border border-gray-300 rounded px-2 py-1">
+   <option value="free">Freeform</option>
+   <option value="original">Original</option>
+   <option value="custom">Custom</option>
+   <option value="1:1">1:1 (Square)</option>
+   <option value="4:3">4:3 (Monitor)</option>
+   <option value="16:9">16:9 (Widescreen)</option>
+   <option value="16:10">16:10</option>
+   <option value="3:2">3:2</option>
+   <option value="5:4">5:4</option>
+   <option value="2:1">2:1</option>
+   <option value="3:1">3:1</option>
+   <option value="4:1">4:1</option>
+   <option value="14:9">14:9</option>
+   <option value="19:10">19:10</option>
+   <option value="21:9">21:9 (Cinemascope)</option>
+   <option value="32:9">32:9 (Super Ultra Wide)</option>
+   </select>
+   </div>
+   <button id="apply-crop-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full mb-2">
+   Crop
+   </button>
+   <button id="reset-crop-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full">
+   Reset
+   </button>
+   </div>
+   </div>
+   </div>
+   </div>
+  </div>
+ <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+   const $=id=>document.getElementById(id);
+ 
+   const editorModal = $('editor-modal');
+   const uploadSingleBtn = $('upload-single');
+   const uploadBatchBtn = $('upload-batch');
+ 
+   async function isPro() {
+    try {
+    const r = await fetch('/me', { credentials: 'include' });
+    return (await r.json()).pro;
+    } catch {
+    return false;
+    }
    }
-  }
-
-  async function redeem() {
-   const t = new URLSearchParams(location.search).get('token');
-   if (!t) return;
-   const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
-   const j = await r.json();
-   if (j.ok) {
-   const u = new URL(location.href);
-   u.searchParams.delete('token');
-   history.replaceState({}, '', u);
+ 
+   async function redeem() {
+    const t = new URLSearchParams(location.search).get('token');
+    if (!t) return;
+    const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
+    const j = await r.json();
+    if (j.ok) {
+    const u = new URL(location.href);
+    u.searchParams.delete('token');
+    history.replaceState({}, '', u);
+    }
    }
-  }
-
-  (async () => {
-   await redeem();
-   if (await isPro()) {
-   $('unlock-pro-btn').style.display = 'none';
+ 
+   (async () => {
+    await redeem();
+    if (await isPro()) {
+    $('unlock-pro-btn').style.display = 'none';
+    }
+   })();
+ 
+   const unlockProBtn = $('unlock-pro-btn');
+   if (unlockProBtn) {
+     unlockProBtn.onclick = () => location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
    }
-  })();
-
-  const unlockProBtn = $('unlock-pro-btn');
-  if (unlockProBtn) {
-    unlockProBtn.onclick = () => location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
-  }
-
-  uploadSingleBtn.addEventListener('click', () => {
-   const input = document.createElement('input');
-   input.type = 'file';
-   input.accept = 'image/*';
-   input.onchange = async (e) => {
-   const file = e.target.files[0];
-   if (file) {
-   const formData = new FormData();
-   formData.append('file', file);
-   const res = await fetch('/api/upload', {
-   method: 'POST',
-   body: formData,
+ 
+   uploadSingleBtn.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+    });
+    const json = await res.json();
+    if (json.success) {
+    const previewPanel = $('preview-panel');
+    const img = new Image();
+    img.onload = () => {
+    originalWidth = img.width;
+    originalHeight = img.height;
+    widthInput.value = originalWidth;
+    heightInput.value = originalHeight;
+    percentageSlider.value = 100;
+    percentageValueSpan.textContent = '100%';
+    };
+    img.src = URL.createObjectURL(file);
+    previewPanel.innerHTML = '';
+    previewPanel.appendChild(img);
+    editorModal.classList.remove('hidden');
+    }
+    }
+    };
+    input.click();
    });
-   const json = await res.json();
-   if (json.success) {
-   const previewPanel = $('preview-panel');
-   const img = new Image();
-   img.onload = () => {
-   originalWidth = img.width;
-   originalHeight = img.height;
-   widthInput.value = originalWidth;
-   heightInput.value = originalHeight;
-   percentageSlider.value = 100;
-   percentageValueSpan.textContent = '100%';
-   };
-   img.src = URL.createObjectURL(file);
-   previewPanel.innerHTML = '';
-   previewPanel.appendChild(img);
-   editorModal.classList.remove('hidden');
-   }
-   }
-   };
-   input.click();
-  });
-
-  uploadBatchBtn.addEventListener('click', async () => {
-   if (await isPro()) {
-   const input = document.createElement('input');
-   input.type = 'file';
-   input.accept = 'image/*';
-   input.multiple = true;
-   input.onchange = (e) => {
-   const files = e.target.files;
-   if (files.length > 0) {
-   editorModal.classList.remove('hidden');
-   }
-   };
-   input.click();
-   } else {
-   location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
-   }
-  });
-
-  const widthInput = $('width');
-  const heightInput = $('height');
-  const lockAspectCheckbox = $('lock-aspect');
-  let originalWidth, originalHeight;
-
-  function handleResize() {
-   if (!originalWidth || !originalHeight) return;
-
-   const aspectRatio = originalWidth / originalHeight;
-   const width = parseInt(widthInput.value);
-   const height = parseInt(heightInput.value);
-
-   if (lockAspectCheckbox.checked) {
-   if (document.activeElement === widthInput) {
-   heightInput.value = Math.round(width / aspectRatio);
-   } else {
-   widthInput.value = Math.round(height * aspectRatio);
-   }
-   }
-  }
-
-  widthInput.addEventListener('input', handleResize);
-  heightInput.addEventListener('input', handleResize);
-
-  const percentageSlider = $('percentage-slider');
-  const percentageValueSpan = $('percentage-value');
-  const unitsSelect = $('units');
-
-  function updatePercentageResize() {
-   if (!originalWidth || !originalHeight) return;
-
-   const percentage = parseInt(percentageSlider.value);
-   percentageValueSpan.textContent = `${percentage}%`;
-
-   const newWidth = Math.round(originalWidth * (percentage / 100));
-   const newHeight = Math.round(originalHeight * (percentage / 100));
-
-   widthInput.value = newWidth;
-   heightInput.value = newHeight;
-  }
-
-  percentageSlider.addEventListener('input', updatePercentageResize);
-  unitsSelect.addEventListener('change', () => {
-   // For now, just update the display, actual unit conversion will happen on the backend
-   console.log(`Selected unit: ${unitsSelect.value}`);
-  });
-
-  // Update originalWidth and originalHeight when a new image is loaded
-  // This part needs to be integrated into the single upload onchange handler
-  // I will modify the single upload onchange handler to include this.
-
-  const socialPlatformSelect = $('social-platform');
-  const socialPresetSelect = $('social-preset');
-
-  let socialPresets = {};
-
-  async function loadSocialPresets() {
-   const res = await fetch('/socialPresets.json');
-   socialPresets = await res.json();
-   for (const platform in socialPresets) {
-   const option = document.createElement('option');
-   option.value = platform;
-   option.textContent = platform;
-   socialPlatformSelect.appendChild(option);
-   }
-  }
-
-  socialPlatformSelect.addEventListener('change', () => {
-   const platform = socialPlatformSelect.value;
-   socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
-   if (platform) {
-   socialPresetSelect.disabled = false;
-   for (const preset in socialPresets[platform]) {
-   const option = document.createElement('option');
-   option.value = preset;
-   option.textContent = preset;
-   socialPresetSelect.appendChild(option);
-   }
-   } else {
-   socialPresetSelect.disabled = true;
-   }
-  });
-
-  socialPresetSelect.addEventListener('change', () => {
-   const platform = socialPlatformSelect.value;
-   const preset = socialPresetSelect.value;
-   if (platform && preset) {
-   const { width, height } = socialPresets[platform][preset];
-   widthInput.value = width;
-   heightInput.value = height;
-   }
-  });
-
-  loadSocialPresets();
-
-  const exportBtn = $('export-btn');
-
-  exportBtn.addEventListener('click', async () => {
-   const image = $('preview-panel').querySelector('img');
-   if (!image || !image.src) {
-     alert('Please upload an image first.');
-     return;
-   }
-
-   let fileBlob;
-   let endpoint = '/process';
-   const form = new FormData();
-
-   if (cropper) {
-     const cropData = cropper.getData(true);
-     form.append('cropData', JSON.stringify(cropData));
-     endpoint = '/process-crop';
-     fileBlob = await (await fetch(image.src)).blob();
-   } else {
-     fileBlob = await (await fetch(image.src)).blob();
-   }
-
-   form.append('file', fileBlob);
-   if ($('background-fill').checked) {
-     form.append('backgroundColor', $('background-color').value);
-   }
-   form.append('w', widthInput.value);
-   form.append('h', heightInput.value);
-   form.append('fmt', $('format').value);
-   form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
-   form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
-   form.append('targetSize', $('target-size').value);
-   form.append('targetSizeUnit', $('target-size-unit').value);
-
-   const res = await fetch(endpoint, {
-     method: 'POST',
-     body: form,
+ 
+   uploadBatchBtn.addEventListener('click', async () => {
+    if (await isPro()) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.onchange = (e) => {
+    const files = e.target.files;
+    if (files.length > 0) {
+    editorModal.classList.remove('hidden');
+    }
+    };
+    input.click();
+    } else {
+    location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
+    }
    });
-
-   if (res.ok) {
-     const blob = await res.blob();
-     const url = URL.createObjectURL(blob);
-     const a = document.createElement('a');
-     a.href = url;
-     a.download = `resized.${$('format').value}`;
-     document.body.appendChild(a);
-     a.click();
-     document.body.removeChild(a);
-   } else {
-     alert('An error occurred during processing.');
+ 
+   const widthInput = $('width');
+   const heightInput = $('height');
+   const lockAspectCheckbox = $('lock-aspect');
+   let originalWidth, originalHeight;
+ 
+   function handleResize() {
+    if (!originalWidth || !originalHeight) return;
+ 
+    const aspectRatio = originalWidth / originalHeight;
+    const width = parseInt(widthInput.value);
+    const height = parseInt(heightInput.value);
+ 
+    if (lockAspectCheckbox.checked) {
+    if (document.activeElement === widthInput) {
+    heightInput.value = Math.round(width / aspectRatio);
+    } else {
+    widthInput.value = Math.round(height * aspectRatio);
+    }
+    }
    }
-  });
-
-  const cropBtn = $('crop-btn');
-  const cropModal = $('crop-modal');
-  const cropPreviewPanel = $('crop-preview-panel');
-  const applyCropBtn = $('apply-crop-btn');
-  const resetCropBtn = $('reset-crop-btn');
-  const aspectRatioSelect = $('aspect-ratio');
-  const cropWidthInput = $('crop-width');
-  const cropHeightInput = $('crop-height');
-  let cropper;
-  let currentImageSrc = '';
-
-  cropBtn.addEventListener('click', () => {
-   const image = $('preview-panel').querySelector('img');
-   if (!image) {
-     alert('Please upload an image first.');
-     return;
+ 
+   widthInput.addEventListener('input', handleResize);
+   heightInput.addEventListener('input', handleResize);
+ 
+   const percentageSlider = $('percentage-slider');
+   const percentageValueSpan = $('percentage-value');
+   const unitsSelect = $('units');
+ 
+   function updatePercentageResize() {
+    if (!originalWidth || !originalHeight) return;
+ 
+    const percentage = parseInt(percentageSlider.value);
+    percentageValueSpan.textContent = `${percentage}%`;
+ 
+    const newWidth = Math.round(originalWidth * (percentage / 100));
+    const newHeight = Math.round(originalHeight * (percentage / 100));
+ 
+    widthInput.value = newWidth;
+    heightInput.value = newHeight;
    }
-   currentImageSrc = image.src;
-   cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
-   const cropImage = cropPreviewPanel.querySelector('img');
-
-   cropModal.classList.remove('hidden');
-
-   if (cropper) {
-     cropper.destroy();
-   }
-   cropper = new Cropper(cropImage, {
-     viewMode: 1,
-     autoCropArea: 1,
-     crop(event) {
-       cropWidthInput.value = Math.round(event.detail.width);
-       cropHeightInput.value = Math.round(event.detail.height);
-     },
+ 
+   percentageSlider.addEventListener('input', updatePercentageResize);
+   unitsSelect.addEventListener('change', () => {
+    // For now, just update the display, actual unit conversion will happen on the backend
+    console.log(`Selected unit: ${unitsSelect.value}`);
    });
-  });
-
-  applyCropBtn.addEventListener('click', () => {
-   if (cropper) {
-     const croppedCanvas = cropper.getCroppedCanvas();
+ 
+   // Update originalWidth and originalHeight when a new image is loaded
+   // This part needs to be integrated into the single upload onchange handler
+   // I will modify the single upload onchange handler to include this.
+ 
+   const socialPlatformSelect = $('social-platform');
+   const socialPresetSelect = $('social-preset');
+ 
+   let socialPresets = {};
+ 
+   async function loadSocialPresets() {
+    const res = await fetch('/socialPresets.json');
+    socialPresets = await res.json();
+    for (const platform in socialPresets) {
+    const option = document.createElement('option');
+    option.value = platform;
+    option.textContent = platform;
+    socialPlatformSelect.appendChild(option);
+    }
+   }
+ 
+   socialPlatformSelect.addEventListener('change', () => {
+    const platform = socialPlatformSelect.value;
+    socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
+    if (platform) {
+    socialPresetSelect.disabled = false;
+    for (const preset in socialPresets[platform]) {
+    const option = document.createElement('option');
+    option.value = preset;
+    option.textContent = preset;
+    socialPresetSelect.appendChild(option);
+    }
+    } else {
+    socialPresetSelect.disabled = true;
+    }
+   });
+ 
+   socialPresetSelect.addEventListener('change', () => {
+    const platform = socialPlatformSelect.value;
+    const preset = socialPresetSelect.value;
+    if (platform && preset) {
+    const { width, height } = socialPresets[platform][preset];
+    widthInput.value = width;
+    heightInput.value = height;
+    }
+   });
+ 
+   loadSocialPresets();
+ 
+   const exportBtn = $('export-btn');
+ 
+   exportBtn.addEventListener('click', async () => {
+    const image = $('preview-panel').querySelector('img');
+    if (!image || !image.src) {
+      alert('Please upload an image first.');
+      return;
+    }
+ 
+    let fileBlob;
+    let endpoint = '/process';
+    const form = new FormData();
+ 
+    if (cropper) {
+      const cropData = cropper.getData(true);
+      form.append('cropData', JSON.stringify(cropData));
+      endpoint = '/process-crop';
+      fileBlob = await (await fetch(image.src)).blob();
+    } else {
+      fileBlob = await (await fetch(image.src)).blob();
+    }
+ 
+    form.append('file', fileBlob);
+    if ($('background-fill').checked) {
+      form.append('backgroundColor', $('background-color').value);
+    }
+    form.append('w', widthInput.value);
+    form.append('h', heightInput.value);
+    form.append('fmt', $('format').value);
+    form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
+    form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
+    form.append('targetSize', $('target-size').value);
+    form.append('targetSizeUnit', $('target-size-unit').value);
+ 
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: form,
+    });
+ 
+    if (res.ok) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `resized.${$('format').value}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      alert('An error occurred during processing.');
+    }
+   });
+ 
+   const cropBtn = $('crop-btn');
+   const cropModal = $('crop-modal');
+   const cropPreviewPanel = $('crop-preview-panel');
+   const applyCropBtn = $('apply-crop-btn');
+   const resetCropBtn = $('reset-crop-btn');
+   const aspectRatioSelect = $('aspect-ratio');
+   const cropWidthInput = $('crop-width');
+   const cropHeightInput = $('crop-height');
+   let cropper;
+   let currentImageSrc = '';
+ 
+   cropBtn.addEventListener('click', () => {
+    const image = $('preview-panel').querySelector('img');
+    if (!image) {
+      alert('Please upload an image first.');
+      return;
+    }
+    currentImageSrc = image.src;
+    cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+    const cropImage = cropPreviewPanel.querySelector('img');
+ 
+    cropModal.classList.remove('hidden');
+ 
+    if (cropper) {
+      cropper.destroy();
+    }
+    cropper = new Cropper(cropImage, {
+      viewMode: 1,
+      autoCropArea: 1,
+      crop(event) {
+        cropWidthInput.value = Math.round(event.detail.width);
+        cropHeightInput.value = Math.round(event.detail.height);
+      },
+    });
+   });
+ 
+   applyCropBtn.addEventListener('click', () => {
+    if (cropper) {
+      const croppedCanvas = cropper.getCroppedCanvas();
+      const image = $('preview-panel').querySelector('img');
+      image.src = croppedCanvas.toDataURL();
+      cropper.destroy();
+      cropper = null;
+      cropModal.classList.add('hidden');
+    }
+   });
+ 
+   resetCropBtn.addEventListener('click', () => {
+    if (cropper) {
+    cropper.reset();
+    }
+   });
+ 
+   aspectRatioSelect.addEventListener('change', () => {
+    if (cropper) {
+      const aspectRatio = aspectRatioSelect.value;
+      if (aspectRatio === 'free') {
+        cropper.setAspectRatio(NaN);
+      } else if (aspectRatio === 'original') {
+        // Need to get original dimensions of the image in the crop modal
+        const cropImage = cropPreviewPanel.querySelector('img');
+        if (cropImage) {
+          cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
+        }
+      } else {
+        const [w, h] = aspectRatio.split(':');
+        cropper.setAspectRatio(w / h);
+      }
+    }
+   });
+ 
+   const rotateLeftBtn = $('rotate-left-btn');
+   const rotateRightBtn = $('rotate-right-btn');
+ 
+   rotateLeftBtn.addEventListener('click', () => {
      const image = $('preview-panel').querySelector('img');
-     image.src = croppedCanvas.toDataURL();
-     cropper.destroy();
-     cropper = null;
-     cropModal.classList.add('hidden');
-   }
-  });
-
-  resetCropBtn.addEventListener('click', () => {
-   if (cropper) {
-   cropper.reset();
-   }
-  });
-
-  aspectRatioSelect.addEventListener('change', () => {
-   if (cropper) {
-     const aspectRatio = aspectRatioSelect.value;
-     if (aspectRatio === 'free') {
-       cropper.setAspectRatio(NaN);
-     } else if (aspectRatio === 'original') {
-       // Need to get original dimensions of the image in the crop modal
-       const cropImage = cropPreviewPanel.querySelector('img');
-       if (cropImage) {
-         cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
-       }
-     } else {
-       const [w, h] = aspectRatio.split(':');
-       cropper.setAspectRatio(w / h);
+     if (image) {
+       const canvas = document.createElement('canvas');
+       const ctx = canvas.getContext('2d');
+       canvas.width = image.height;
+       canvas.height = image.width;
+       ctx.translate(canvas.width / 2, canvas.height / 2);
+       ctx.rotate(-Math.PI / 2);
+       ctx.drawImage(image, -image.width / 2, -image.height / 2);
+       image.src = canvas.toDataURL();
      }
-   }
+   });
+ 
+   rotateRightBtn.addEventListener('click', () => {
+     const image = $('preview-panel').querySelector('img');
+     if (image) {
+       const canvas = document.createElement('canvas');
+       const ctx = canvas.getContext('2d');
+       canvas.width = image.height;
+       canvas.height = image.width;
+       ctx.translate(canvas.width / 2, canvas.height / 2);
+       ctx.rotate(Math.PI / 2);
+       ctx.drawImage(image, -image.width / 2, -image.height / 2);
+       image.src = canvas.toDataURL();
+     }
+   });
   });
-
-  const rotateLeftBtn = $('rotate-left-btn');
-  const rotateRightBtn = $('rotate-right-btn');
-
-  rotateLeftBtn.addEventListener('click', () => {
-    const image = $('preview-panel').querySelector('img');
-    if (image) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = image.height;
-      canvas.height = image.width;
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.drawImage(image, -image.width / 2, -image.height / 2);
-      image.src = canvas.toDataURL();
-    }
-  });
-
-  rotateRightBtn.addEventListener('click', () => {
-    const image = $('preview-panel').querySelector('img');
-    if (image) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = image.height;
-      canvas.height = image.width;
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(Math.PI / 2);
-      ctx.drawImage(image, -image.width / 2, -image.height / 2);
-      image.src = canvas.toDataURL();
-    }
-  });
- });
-</script>
+ </script>
+</body>
+</html>

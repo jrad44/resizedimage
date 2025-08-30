@@ -13,9 +13,12 @@
   --glass-border: 0 0% 100%;
 
   /* Primary - Blue/Indigo system */
-  --primary: 217 100% 64%;
+  --primary: 217 91% 60%; /* Updated to #3B82F6 */
   --primary-foreground: 220 17% 7%;
   --primary-glow: 225 100% 72%;
+
+  /* Pro Button Purple */
+  --pro-button-purple: 275 70% 37%; /* #6A0DAD */
 
   /* Secondary glassmorphic elements */
   --secondary: 0 0% 100%;
@@ -130,6 +133,14 @@ body {
   background: var(--gradient-bg);
   background-size: 120% 120%;
   animation: bgShift 28s linear infinite;
+}
+
+.bg-pro-purple {
+  background-color: hsl(var(--pro-button-purple));
+}
+
+.hover\:bg-pro-purple\/90:hover {
+  background-color: hsl(var(--pro-button-purple) / 0.9);
 }
 
 /* Existing styles for modals and inputs */

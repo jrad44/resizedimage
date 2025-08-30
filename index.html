@@ -64,7 +64,7 @@
 </head>
 <body class="text-white">
 
-  <div class="min-h-screen text-foreground relative overflow-hidden">
+  <div class="min-h-screen text-foreground relative">
     <!-- Animated background with soft radial glows -->
     <div class="pointer-events-none absolute inset-0 -z-10">
       <div class="absolute inset-0 bg-animated opacity-90"></div>
@@ -75,7 +75,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-20">
+    <nav class="fixed top-0 z-20 w-full">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
         <div class="flex items-center justify-between rounded-full glass-nav px-4 py-2">
           <div class="flex items-center gap-3">
@@ -104,9 +104,9 @@
             <button variant="outline" size="sm" class="glass-button rounded-full">
               Sign Up
             </button>
-            <button 
-              size="sm" 
-              class="ml-1 rounded-full font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+            <button
+              size="sm"
+              class="ml-1 rounded-full font-semibold bg-pro-purple hover:bg-pro-purple/90 text-primary-foreground"
             >
               Unlock Pro $2
             </button>

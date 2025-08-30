@@ -14,6 +14,7 @@
 
   /* Primary - Blue/Indigo system */
   --primary: 217 91% 60%; /* Updated to #3B82F6 */
+  --primary-blue: 217 91% 60%; /* Explicitly define primary blue */
   --primary-foreground: 220 17% 7%;
   --primary-glow: 225 100% 72%;
 
@@ -110,6 +111,11 @@ body {
   backdrop-filter: var(--backdrop-blur);
   border: 1px solid rgba(255, 255, 255, 0.15);
   transition: var(--transition-smooth);
+  padding: 0.5rem 1.25rem; /* Increased padding for better text fit */
+  min-width: 80px; /* Ensure minimum width */
+  display: inline-flex; /* Ensure flex properties for content alignment */
+  justify-content: center; /* Center text horizontally */
+  align-items: center; /* Center text vertically */
 }
 
 .glass-button:hover {
@@ -137,6 +143,11 @@ body {
 
 .bg-pro-purple {
   background-color: hsl(var(--pro-button-purple));
+  padding: 0.5rem 1.25rem; /* Increased padding for better text fit */
+  min-width: 120px; /* Ensure minimum width for "Unlock Pro $2" */
+  display: inline-flex; /* Ensure flex properties for content alignment */
+  justify-content: center; /* Center text horizontally */
+  align-items: center; /* Center text vertically */
 }
 
 .hover\:bg-pro-purple\/90:hover {

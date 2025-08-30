@@ -632,7 +632,20 @@
                 if (await isPro()) {
                     const unlockProBtn = document.getElementById('unlock-pro-btn');
                     if (unlockProBtn) {
-                        unlockProBtn.style.display = 'none';
+                        unlockProBtn.textContent = 'PRO User';
+                        unlockProBtn.removeAttribute('href'); // Remove the link
+                        unlockProBtn.style.cursor = 'default'; // Change cursor to indicate it's not clickable
+                        unlockProBtn.classList.remove('bg-indigo-400/90', 'hover:bg-indigo-400', 'text-slate-900');
+                        unlockProBtn.classList.add('bg-gray-600', 'text-white', 'cursor-not-allowed'); // New styling for PRO User
+                    }
+                    // Also update the mobile menu pro button
+                    const mobileProBtn = document.querySelector('#mobile-nav a[href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02"]');
+                    if (mobileProBtn) {
+                        mobileProBtn.textContent = 'PRO User';
+                        mobileProBtn.removeAttribute('href');
+                        mobileProBtn.style.cursor = 'default';
+                        mobileProBtn.classList.remove('bg-indigo-400/90', 'hover:bg-indigo-400', 'text-slate-900'); // Remove old styling
+                        mobileProBtn.classList.add('bg-gray-600', 'text-white', 'cursor-not-allowed'); // New styling for PRO User
                     }
                 }
             })();

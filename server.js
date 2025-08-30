@@ -170,64 +170,16 @@ app.post('/process-crop', upload.single('file'), async (req, res) => {
 });
 
 app.post('/api/upload', upload.single('file'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ success: false, error: 'No file uploaded.' });
-    }
-
-    try {
-        const metadata = await sharp(req.file.buffer).metadata();
-        res.json({
-            success: true,
-            file: {
-                name: req.file.originalname,
-                size: req.file.size,
-                width: metadata.width,
-                height: metadata.height,
-            },
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: 'Could not read image dimensions.' });
-    }
-});
-
-app.post('/api/transform', upload.single('file'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ success: false, error: 'No file uploaded.' });
-    }
-
-    try {
-        const { w, h, fmt, q, keepAspect, backgroundColor } = req.body;
-        const width = parseInt(w, 10);
-        const height = parseInt(h, 10);
-        const quality = Math.round((parseFloat(q) || 0.85) * 100);
-        const keep = keepAspect === '1';
-
-        let img = sharp(req.file.buffer).rotate();
-        
-        if (keep) {
-            img = img.resize(width, height, { fit: 'inside', withoutEnlargement: false });
-        } else {
-            img = img.resize(width, height, { fit: 'cover', position: 'centre', background: backgroundColor || '#ffffff' });
-        }
-
-        let outputBuffer;
-        const format = fmt || 'jpeg';
-
-        if (format === 'png') {
-            outputBuffer = await img.png({ compressionLevel: 9 }).toBuffer();
-        } else if (format === 'webp') {
-            outputBuffer = await img.webp({ quality }).toBuffer();
-        } else {
-            outputBuffer = await img.jpeg({ quality, mozjpeg: true }).toBuffer();
-        }
-        
-        res.setHeader('Content-Type', `image/${format}`);
-        res.setHeader('Content-Disposition', `attachment; filename="transformed.${format}"`);
-        res.send(outputBuffer);
-
-    } catch (error) {
-        res.status(500).json({ success: false, error: 'Image transformation failed.' });
-    }
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.json({
+    success: true,
+    file: {
+      name: req.file.originalname,
+      size: req.file.size,
+    },
+  });
 });
 
 app.get('/', (_req,res)=>res.sendFile(path.join(__dirname,'index.html')));

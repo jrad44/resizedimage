@@ -196,22 +196,16 @@
     <!-- Upload Cards -->
     <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-10">
         <div class="grid md:grid-cols-2 gap-6">
-            <!-- Main Upload Card -->
-            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8">
-                <div class="flex flex-col items-center text-center gap-4">
-                    <h2 class="text-2xl font-bold tracking-tight">
-                        Upload an Image to Get Started
-                    </h2>
-                    <p class="text-slate-200/90 max-w-md">
-                        Drag and drop a file or click the button below to select an image from your device.
-                    </p>
-                    
-                    <button id="single-upload-btn"
-                        class="mt-2 inline-flex items-center gap-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-900 font-semibold px-6 py-3 text-lg transition-colors shadow-lg shadow-blue-500/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        Select Image
+            <!-- Single Image -->
+            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-6">
+                <div class="flex flex-col items-center text-center gap-2">
+                    <div class="text-4xl">🖼️</div>
+                    <h2 class="text-xl font-semibold">Single Image Upload</h2>
+                    <p class="text-xs text-slate-200/80">or</p>
+
+                    <button id="single-upload-btn" 
+                        class="mt-1 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-medium px-4 py-2 transition-colors">
+                        <span class="text-lg">📁</span> Browse File
                     </button>
 
                     <input id="single-file-input"
@@ -220,30 +214,28 @@
                         class="file-input-hidden"
                     />
 
-                    <p class="mt-2 text-xs text-slate-300">
+                    <p class="mt-3 text-xs text-slate-300">
                         Supports: JPG, PNG, WEBP (Max 10MB)
                     </p>
                 </div>
             </div>
 
             <!-- PRO Batch Upload -->
-            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8">
-                <div class="flex flex-col items-center text-center gap-3">
+            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-6">
+                <div class="flex flex-col items-center text-center gap-2">
                     <div class="flex items-center gap-2">
-                        <h2 class="text-xl font-semibold">Batch Upload</h2>
-                        <span class="text-[10px] font-bold bg-yellow-300 text-slate-900 px-2 py-0.5 rounded-full">PRO</span>
+                        <div class="text-4xl">🗝️</div>
+                        <span class="ml-1 text-[10px] font-bold bg-yellow-300 text-slate-900 px-2 py-0.5 rounded-full">PRO</span>
                     </div>
-                    <p class="text-slate-200/90 text-sm max-w-md">
-                        Process multiple images at once. Lifetime access for a small one-time payment.
+                    <h2 class="text-xl font-semibold">$2.00 PRO Batch Upload</h2>
+                    <p class="max-w-md text-sm text-slate-200/90">
+                        Unlock for Lifetime access to all PRO features and future website tools. Your support truly means the world to us 😊
                     </p>
-                    
+                    <p class="text-xs text-slate-200/80">or</p>
+
                     <button id="batch-upload-btn"
-                        class="mt-2 inline-flex items-center gap-2 rounded-lg bg-purple-500 hover:bg-purple-400 text-slate-900 font-medium px-4 py-2 transition-colors shadow-lg shadow-purple-500/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13 7H7v6h6V7z" />
-                            <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3 1a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1H5z" clip-rule="evenodd" />
-                        </svg>
-                        Select Multiple Images
+                        class="mt-1 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-medium px-4 py-2 transition-colors">
+                        <span class="text-lg">📁</span> Browse Files
                     </button>
 
                     <input id="batch-file-input"
@@ -252,6 +244,10 @@
                         accept=".jpg,.jpeg,.png,.webp"
                         class="file-input-hidden"
                     />
+
+                    <p class="mt-3 text-xs text-slate-300">
+                        Supports: JPG, PNG, WEBP (Max 10MB each)
+                    </p>
                 </div>
             </div>
         </div>
@@ -349,59 +345,44 @@
 
     <!-- Modals from original index.html -->
     <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-      <div class="glass-card rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl w-11/12 max-w-6xl h-[80vh] flex flex-col">
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between p-4 border-b border-white/15">
-        <h2 class="text-xl font-semibold">Image Editor</h2>
-        <div class="flex items-center gap-2">
-            <button id="rotate-left-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Rotate Left" aria-label="Rotate Left">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <button id="rotate-right-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Rotate Right" aria-label="Rotate Right">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.707-7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7a1 1 0 10-2 0v3.586l-1.293-1.293z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <button id="crop-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Crop Image" aria-label="Crop Image">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M15 2a1 1 0 011 1v2a1 1 0 11-2 0V3H6v10h2a1 1 0 110 2H6a1 1 0 01-1-1V3a1 1 0 011-1h9zM3 6a1 1 0 011-1h2a1 1 0 110 2H4v10h10v-2a1 1 0 112 0v2a1 1 0 01-1 1H4a1 1 0 01-1-1V6z" />
-                </svg>
-            </button>
-            <button id="close-editor-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Close" aria-label="Close Editor">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            </div>
-        </div>
-        
-        <!-- Modal Body -->
-        <div class="flex-1 flex overflow-hidden">
-            <!-- Main Content -->
-            <div class="flex-1 flex items-center justify-center p-4 bg-black/20">
-                <div id="preview-panel" class="w-full h-full flex items-center justify-center relative">
-                    <p class="text-slate-400">Image Preview</p>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="w-80 bg-white/5 border-l border-white/15 overflow-y-auto">
-                <div class="p-4">
-                    <div class="space-y-2">
-                        <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
-                        <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
-                        <button class="tab-btn" data-tab="social-media">Social Media</button>
-                    </div>
+      <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-6xl">
+     <div class="p-8">
+     <div class="flex justify-between items-center mb-4">
+     <h2 class="text-2xl font-bold">Image Editor</h2>
+     <div>
+     <button id="rotate-left-btn" class="editor-modal-button p-2 rounded-full text-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+     </button>
+     <button id="rotate-right-btn" class="editor-modal-button p-2 rounded-full text-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+     </button>
+     <button id="crop-btn" class="editor-modal-button p-2 rounded-full text-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+     </button>
+     </div>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+     <div class="md:col-span-2">
+     <div id="preview-panel" class="bg-gray-700 h-96 flex items-center justify-center relative overflow-hidden">
+     <p>Image Preview</p>
+     </div>
+     </div>
+     <div>
+     <div class="mb-4">
+     <div class="flex border-b">
+     <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
+     <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
+     <button class="tab-btn" data-tab="social-media">Social Media</button>
+     </div>
+     </div>
      <div id="by-size" class="tab-content">
      <div class="flex items-center mb-4">
      <label for="width" class="w-16">Width:</label>
-     <input type="number" id="width" class="form-input w-24">
+     <input type="number" id="width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
      </div>
      <div class="flex items-center mb-4">
      <label for="height" class="w-16">Height:</label>
-     <input type="number" id="height" class="form-input w-24">
+     <input type="number" id="height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
      </div>
      <div class="flex items-center">
      <input type="checkbox" id="lock-aspect" class="mr-2" checked>
@@ -415,7 +396,7 @@
      </div>
      <div class="flex items-center mt-4">
      <label for="as-percentage-units" class="mr-2">Units:</label>
-     <select id="as-percentage-units" class="form-select">
+     <select id="as-percentage-units" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
      <option value="px">Pixels</option>
      <option value="in">Inches</option>
      <option value="cm">Centimeters</option>
@@ -431,13 +412,13 @@
      <div id="social-media" class="tab-content hidden">
      <div class="flex items-center mb-4">
      <label for="social-platform" class="mr-2">Platform:</label>
-     <select id="social-platform" class="form-select w-full">
+     <select id="social-platform" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white">
      <option value="">Select Platform</option>
      </select>
      </div>
      <div class="flex items-center mb-4">
      <label for="social-preset" class="mr-2">Preset:</label>
-     <select id="social-preset" class="form-select w-full" disabled>
+     <select id="social-preset" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white" disabled>
      <option value="">Select Preset</option>
      </select>
      </div>
@@ -446,31 +427,29 @@
      <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
      <div class="flex items-center mb-4">
      <label for="target-size" class="mr-2">Target File Size (optional):</label>
-     <input type="number" id="target-size" class="form-input w-24">
-     <select id="target-size-unit" class="form-select ml-2">
+     <input type="number" id="target-size" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     <select id="target-size-unit" class="border border-gray-600 rounded px-2 py-1 ml-2 bg-gray-800 text-white">
      <option value="KB">KB</option>
      <option value="MB">MB</option>
      </select>
      </div>
      <div class="flex items-center mb-4">
      <label for="format" class="mr-2">Save Image As:</label>
-     <select id="format" class="form-select">
+     <select id="format" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
      <option value="original">Original</option>
      <option value="jpeg">JPEG</option>
      <option value="png">PNG</option>
      <option value="webp">WebP</option>
      </select>
      </div>
-                    <button id="export-btn" class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-semibold px-4 py-2 transition-colors shadow-lg shadow-blue-500/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Export Image
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+     <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">
+     Export
+     </button>
+     </div>
+     </div>
+     </div>
+     </div>
+     </div>
     </div>
     <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
      <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-4xl">
@@ -542,7 +521,6 @@
 
             // Modals and editor elements (from original JS)
             const editorModal = document.getElementById('editor-modal');
-            const closeEditorBtn = document.getElementById('close-editor-btn');
             const widthInput = document.getElementById('width');
             const heightInput = document.getElementById('height');
             const lockAspectCheckbox = document.getElementById('lock-aspect');
@@ -693,22 +671,16 @@
                         const previewPanel = document.getElementById('preview-panel');
                         const img = new Image();
                         img.onload = () => {
-                            originalWidth = json.file.width;
-                            originalHeight = json.file.height;
+                            originalWidth = img.width;
+                            originalHeight = img.height;
                             widthInput.value = originalWidth;
                             heightInput.value = originalHeight;
                             percentageSlider.value = 100;
                             percentageValueSpan.textContent = '100%';
-                            
-                            URL.revokeObjectURL(img.src); // Clean up memory
                         };
                         img.src = URL.createObjectURL(file);
-                        
-                        const previewImage = new Image();
-                        previewImage.src = img.src;
                         previewPanel.innerHTML = '';
-                        previewPanel.appendChild(previewImage);
-                        
+                        previewPanel.appendChild(img);
                         editorModal.classList.remove('hidden');
                     } else {
                         showError(json.error || 'File upload failed.');
@@ -734,46 +706,36 @@
             // Resize functionality (from original JS)
             function handleResize() {
                 if (!originalWidth || !originalHeight) return;
-
+           
                 const aspectRatio = originalWidth / originalHeight;
-                let width = parseInt(widthInput.value);
-                let height = parseInt(heightInput.value);
-
-                if (isNaN(width) && isNaN(height)) return;
-
+                const width = parseInt(widthInput.value);
+                const height = parseInt(heightInput.value);
+           
                 if (lockAspectCheckbox.checked) {
-                    if (document.activeElement === widthInput && !isNaN(width)) {
+                    if (document.activeElement === widthInput) {
                         heightInput.value = Math.round(width / aspectRatio);
-                    } else if (!isNaN(height)) {
+                    } else {
                         widthInput.value = Math.round(height * aspectRatio);
                     }
                 }
-                
-                // Update percentage slider
-                if (!isNaN(width)) {
-                    const percentage = Math.round((width / originalWidth) * 100);
-                    percentageSlider.value = percentage;
-                    percentageValueSpan.textContent = `${percentage}%`;
-                }
             }
-
+           
             widthInput.addEventListener('input', handleResize);
             heightInput.addEventListener('input', handleResize);
-            lockAspectCheckbox.addEventListener('change', handleResize);
-
+           
             function updatePercentageResize() {
                 if (!originalWidth || !originalHeight) return;
-
+           
                 const percentage = parseInt(percentageSlider.value);
                 percentageValueSpan.textContent = `${percentage}%`;
-
+           
                 const newWidth = Math.round(originalWidth * (percentage / 100));
                 const newHeight = Math.round(originalHeight * (percentage / 100));
-
+           
                 widthInput.value = newWidth;
                 heightInput.value = newHeight;
             }
-
+           
             percentageSlider.addEventListener('input', updatePercentageResize);
             unitsSelect.addEventListener('change', () => {
                 console.log(`Selected unit: ${unitsSelect.value}`);
@@ -823,104 +785,88 @@
             exportBtn.addEventListener('click', async () => {
                 const image = document.getElementById('preview-panel').querySelector('img');
                 if (!image || !image.src) {
-                    showError('Please upload an image first.');
+                    alert('Please upload an image first.');
                     return;
                 }
-
-                const format = document.getElementById('format').value;
-                const targetSize = document.getElementById('target-size').value;
-                const targetSizeUnit = document.getElementById('target-size-unit').value;
-
-                const formData = new FormData();
-                const originalBlob = await (await fetch(image.src)).blob();
-                formData.append('files', originalBlob, 'image' + (format ? `.${format}`: ''));
-
-                formData.append('w', widthInput.value);
-                formData.append('h', heightInput.value);
-                formData.append('fmt', format);
-                formData.append('q', 0.85); // Default quality
-                formData.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
-                if (document.getElementById('background-fill').checked) {
-                    formData.append('backgroundColor', document.getElementById('background-color').value);
-                }
-                if (targetSize) {
-                    formData.append('targetSize', targetSize);
-                    formData.append('targetSizeUnit', targetSizeUnit);
-                }
-
-                try {
-                    const res = await fetch('/process', {
-                        method: 'POST',
-                        body: formData,
+           
+                let fileBlob;
+                let endpoint = '/process';
+                const form = new FormData();
+           
+                if (cropper) {
+                    const cropData = cropper.getData(true);
+                    form.append('cropData', JSON.stringify(cropData));
+                    endpoint = '/process-crop';
+                    fileBlob = await new Promise(resolve => {
+                        cropper.getCroppedCanvas().toBlob(resolve);
                     });
-
-                    if (res.ok) {
-                        const blob = await res.blob();
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        const extension = format === 'original' ? 'jpg' : format;
-                        a.download = `resized.${extension}`;
-                        a.href = url;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    } else {
-                        const errorText = await res.text();
-                        showError(`Error: ${errorText}`);
-                    }
-                } catch (error) {
-                    showError('An unexpected error occurred during export.');
+                } else {
+                    fileBlob = await (await fetch(image.src)).blob();
+                }
+           
+                form.append('file', fileBlob);
+                if (document.getElementById('background-fill').checked) {
+                    form.append('backgroundColor', document.getElementById('background-color').value);
+                }
+                form.append('w', widthInput.value);
+                form.append('h', heightInput.value);
+                form.append('fmt', document.getElementById('format').value);
+                form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
+                form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
+                form.append('targetSize', document.getElementById('target-size').value);
+                form.append('targetSizeUnit', document.getElementById('target-size-unit').value);
+           
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    body: form,
+                });
+           
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `resized.${document.getElementById('format').value}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert('An error occurred during processing.');
                 }
             });
            
-            // Crop functionality
+            // Crop functionality (from original JS)
             cropBtn.addEventListener('click', () => {
                 const image = document.getElementById('preview-panel').querySelector('img');
                 if (!image) {
-                    showError('Please upload an image first.');
+                    alert('Please upload an image first.');
                     return;
                 }
                 currentImageSrc = image.src;
-                
-                cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%;">`;
+                cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%; max-height: 100%;">`;
                 const cropImage = cropPreviewPanel.querySelector('img');
-                
+           
                 cropModal.classList.remove('hidden');
-
+           
                 if (cropper) {
                     cropper.destroy();
                 }
-
                 cropper = new Cropper(cropImage, {
                     viewMode: 1,
                     autoCropArea: 1,
                     background: false,
-                    responsive: true,
                     crop(event) {
                         cropWidthInput.value = Math.round(event.detail.width);
                         cropHeightInput.value = Math.round(event.detail.height);
                     },
                 });
             });
-
+           
             applyCropBtn.addEventListener('click', () => {
                 if (cropper) {
-                    const croppedCanvas = cropper.getCroppedCanvas({
-                        imageSmoothingEnabled: true,
-                        imageSmoothingQuality: 'high',
-                    });
+                    const croppedCanvas = cropper.getCroppedCanvas();
                     const image = document.getElementById('preview-panel').querySelector('img');
-                    
-                    // Update the main preview with the cropped image
                     image.src = croppedCanvas.toDataURL();
-                    
-                    // Update original dimensions to cropped dimensions
-                    originalWidth = croppedCanvas.width;
-                    originalHeight = croppedCanvas.height;
-                    widthInput.value = originalWidth;
-                    heightInput.value = originalHeight;
-                    
                     cropper.destroy();
                     cropper = null;
                     cropModal.classList.add('hidden');
@@ -988,11 +934,6 @@
                     button.classList.add('active-tab');
                     document.getElementById(button.dataset.tab).classList.remove('hidden');
                 });
-            });
-
-            // Close editor modal
-            closeEditorBtn.addEventListener('click', () => {
-                editorModal.classList.add('hidden');
             });
         });
     </script>

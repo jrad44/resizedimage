@@ -14,7 +14,6 @@
 
   /* Primary - Blue/Indigo system */
   --primary: 217 91% 60%; /* Updated to #3B82F6 */
-  --primary-blue: 217 91% 60%; /* Explicitly define primary blue */
   --primary-foreground: 220 17% 7%;
   --primary-glow: 225 100% 72%;
 
@@ -92,32 +91,6 @@ body {
   color: hsl(var(--foreground));
 }
 
-/* Glassmorphic utilities */
-.glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: var(--backdrop-blur);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: var(--shadow-glass);
-}
-
-.glass-nav {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: var(--backdrop-blur);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.glass-button {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: var(--backdrop-blur);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: var(--transition-smooth);
-}
-
-.glass-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
-}
-
 /* Background animations */
 @keyframes bgShift {
   0% { transform: translate3d(0,0,0); }
@@ -130,18 +103,40 @@ body {
   50% { transform: translateY(-10px); }
 }
 
-.bg-animated {
-  background: var(--gradient-bg);
-  background-size: 120% 120%;
-  animation: bgShift 28s linear infinite;
+/* New styles from provided HTML */
+.grain-overlay {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence baseFrequency="0.75" numOctaves="2"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>');
 }
 
-.bg-pro-purple {
-  background-color: hsl(var(--pro-button-purple));
+@media (max-width: 768px) {
+    .mobile-nav-menu {
+        display: none;
+    }
+    
+    .mobile-nav-menu.active {
+        display: flex;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        flex-direction: column;
+        padding: 1rem;
+        z-index: 10;
+    }
 }
 
-.hover\:bg-pro-purple\/90:hover {
-  background-color: hsl(var(--pro-button-purple) / 0.9);
+.file-input-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toast-transition {
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Existing styles for modals and inputs */

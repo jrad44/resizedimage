@@ -1,831 +1,928 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ResizedImage.com</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="new-design.css">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4695148041573402"
-     crossorigin="anonymous"></script>
-  <style>
-    /* Existing styles for modals and inputs */
-    #preview-panel img, #crop-preview-panel img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-    .editor-modal-button {
-      background-color: #4a5568; /* A darker gray for contrast */
-      color: white;
-    }
-    .editor-modal-button:hover {
-      background-color: #2d3748;
-    }
-    .tab-btn {
-      padding: 0.5rem 1rem;
-      border-bottom: 2px solid transparent;
-      color: #a0aec0; /* Light gray for inactive tabs */
-    }
-    .tab-btn.active-tab {
-      border-color: #667eea; /* Blue for active tab */
-      color: white;
-    }
-    .tab-btn:hover {
-      color: white;
-    }
-    /* Ensure cropper is visible and centered */
-    .cropper-container {
-      max-width: 100%;
-      max-height: 100%;
-      display: block;
-      margin: auto;
-    }
-    /* Adjust modal background for better visibility */
-    #editor-modal .bg-white, #crop-modal .bg-white {
-      background-color: #2d3748; /* Darker background for modals */
-      color: white;
-    }
-    /* Adjust input field styles for visibility */
-    .border-gray-300 {
-      border-color: #4a5568;
-    }
-    .bg-gray-200 {
-      background-color: #4a5568;
-    }
-    #editor-modal {
-      z-index: 1000; /* Ensure editor modal is above other content */
-    }
-    #crop-modal {
-      z-index: 1010; /* Ensure crop modal is above editor modal */
-    }
-  </style>
-</head>
-<body class="text-white">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResizedImage - Resize Images Effortlessly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'bg-shift': 'bgShift 28s linear infinite',
+                    },
+                    keyframes: {
+                        bgShift: {
+                            '0%': { transform: 'translate3d(0,0,0)' },
+                            '50%': { transform: 'translate3d(-2%,1%,0)' },
+                            '100%': { transform: 'translate3d(0,0,0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="new-design.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4695148041573402"
+       crossorigin="anonymous"></script>
+    <style type="text/css">
+        /* Existing styles for modals and inputs */
+        #preview-panel img, #crop-preview-panel img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+        }
+        .editor-modal-button {
+          background-color: #4a5568; /* A darker gray for contrast */
+          color: white;
+        }
+        .editor-modal-button:hover {
+          background-color: #2d3748;
+        }
+        .tab-btn {
+          padding: 0.5rem 1rem;
+          border-bottom: 2px solid transparent;
+          color: #a0aec0; /* Light gray for inactive tabs */
+        }
+        .tab-btn.active-tab {
+          border-color: #667eea; /* Blue for active tab */
+          color: white;
+        }
+        .tab-btn:hover {
+          color: white;
+        }
+        /* Ensure cropper is visible and centered */
+        .cropper-container {
+          max-width: 100%;
+          max-height: 100%;
+          display: block;
+          margin: auto;
+        }
+        /* Adjust modal background for better visibility */
+        #editor-modal .bg-white, #crop-modal .bg-white {
+          background-color: #2d3748; /* Darker background for modals */
+          color: white;
+        }
+        /* Adjust input field styles for visibility */
+        .border-gray-300 {
+          border-color: #4a5568;
+        }
+        .bg-gray-200 {
+          background-color: #4a5568;
+        }
+        #editor-modal {
+          z-index: 1000; /* Ensure editor modal is above other content */
+        }
+        #crop-modal {
+          z-index: 1010; /* Ensure crop modal is above editor modal */
+        }
 
-  <div class="min-h-screen text-foreground relative">
-    <!-- Animated background with soft radial glows -->
+        /* New styles from provided HTML */
+        .grain-overlay {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence baseFrequency="0.75" numOctaves="2"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>');
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-nav-menu {
+                display: none;
+            }
+            
+            .mobile-nav-menu.active {
+                display: flex;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(12px);
+                border-top: 1px solid rgba(255, 255, 255, 0.15);
+                flex-direction: column;
+                padding: 1rem;
+                z-index: 10;
+            }
+        }
+        
+        .file-input-hidden {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toast-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-50 relative overflow-x-hidden">
+    <!-- Background: big soft radial glows + subtle grain -->
     <div class="pointer-events-none absolute inset-0 -z-10">
-      <div class="absolute inset-0 bg-animated opacity-90"></div>
-      <div 
-        class="absolute inset-0 mix-blend-soft-light opacity-[0.08]"
-        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence baseFrequency=%220.75%22 numOctaves=%222%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>')"
-      ></div>
+        <div class="absolute inset-0 opacity-90" 
+             style="background: radial-gradient(1200px 800px at 20% 15%, rgba(118,142,255,0.22) 0%, transparent 60%), radial-gradient(900px 700px at 80% 85%, rgba(255,179,120,0.22) 0%, transparent 55%); background-size: 120% 120%;"
+             class="animate-bg-shift">
+        </div>
+        <div class="absolute inset-0 mix-blend-soft-light opacity-[0.08] grain-overlay"></div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 z-20 w-full">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
-        <div class="flex items-center justify-between rounded-full glass-nav px-4 py-2">
-          <div class="flex items-center gap-3">
-            <div class="size-8 rounded-lg glass-button grid place-items-center text-lg">
-              📷
+    <!-- Mobile menu button (hidden on desktop) -->
+    <div class="md:hidden fixed top-4 right-4 z-30">
+        <button id="mobile-menu-btn" class="p-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/15">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Top Nav -->
+    <nav class="sticky top-0 z-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center justify-between rounded-full bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2">
+                <div class="flex items-center gap-3">
+                    <div class="size-8 rounded-lg bg-white/15 grid place-items-center">📷</div>
+                    <a href="/" class="font-semibold tracking-tight">ResizedImage.com</a>
+                </div>
+                <div class="hidden md:flex items-center gap-6 text-sm text-slate-200">
+                    <a href="/image-resize" class="hover:text-white">Image Resize</a>
+                    <a href="/pdf-merge" class="hover:text-white">PDF Merge</a>
+                    <a href="/bg-remover" class="hover:text-white">BG Remover</a>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="/login" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15">
+                        Login
+                    </a>
+                    <a href="/signup" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15">
+                        Sign Up
+                    </a>
+                    <a id="unlock-pro-btn" href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02" class="ml-1 px-3 py-1.5 rounded-full text-sm font-semibold bg-indigo-400/90 hover:bg-indigo-400 text-slate-900">
+                        Unlock Pro $2
+                    </a>
+                </div>
+                
+                <!-- Mobile menu (hidden on desktop) -->
+                <div class="md:hidden mobile-nav-menu" id="mobile-nav">
+                    <div class="flex flex-col space-y-4 py-4">
+                        <a href="/image-resize" class="hover:text-white">Image Resize</a>
+                        <a href="/pdf-merge" class="hover:text-white">PDF Merge</a>
+                        <a href="/bg-remove" class="hover:text-white">BG Remover</a>
+                        <div class="flex flex-col space-y-2 pt-4 border-t border-white/15">
+                            <a href="/login" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15 text-center">
+                                Login
+                            </a>
+                            <a href="/signup" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15 text-center">
+                                Sign Up
+                            </a>
+                            <a href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02" class="px-3 py-1.5 rounded-full text-sm font-semibold bg-indigo-400/90 hover:bg-indigo-400 text-slate-900 text-center">
+                                Unlock Pro $2
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <a href="/" class="font-semibold tracking-tight text-foreground">
-              ResizedImage.com
-            </a>
-          </div>
-          <div class="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="/image-resize" class="hover:text-foreground transition-colors">
-              Image Resize
-            </a>
-            <a href="/pdf-merge" class="hover:text-foreground transition-colors">
-              PDF Merge
-            </a>
-            <a href="/bg-remover" class="hover:text-foreground transition-colors">
-              BG Remover
-            </a>
-          </div>
-          <div class="flex items-center gap-2">
-            <button variant="outline" size="sm" class="glass-button rounded-full">
-              Login
-            </button>
-            <button variant="outline" size="sm" class="glass-button rounded-full">
-              Sign Up
-            </button>
-            <button
-              id="unlock-pro-btn"
-              size="sm"
-              class="ml-1 rounded-full font-semibold bg-pro-purple hover:bg-pro-purple/90 text-primary-foreground"
-            >
-              Unlock Pro $2
-            </button>
-          </div>
         </div>
-      </div>
     </nav>
 
-    <!-- Mobile Menu (hidden by default) -->
-    <div id="mobile-menu" class="md:hidden bg-gray-800 px-4 pt-2 pb-4 space-y-1 hidden">
-      <a href="/image-resize" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Image Resize</a>
-      <a href="/pdf-merge" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">PDF Merge</a>
-      <a href="/bg-remover" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">BG Remover</a>
-      <a href="/login" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Login</a>
-      <a href="/signup" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700">Sign Up</a>
-      <a href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-purple-700 bg-purple-600">Unlock Pro $2</a>
-    </div>
-
-    <!-- Hero Section -->
+    <!-- Hero -->
     <header class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center pt-16 md:pt-24">
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
-        ResizedImage
-      </h1>
-      <p class="mt-3 text-muted-foreground text-lg">
-        Resize images effortlessly for free
-      </p>
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
+            ResizedImage
+        </h1>
+        <p class="mt-3 text-slate-200/90 text-lg">
+            Resize images effortlessly for free
+        </p>
     </header>
 
     <!-- Upload Cards -->
     <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-10">
-      <div class="grid md:grid-cols-2 gap-6">
-        <!-- Single Image Upload -->
-        <div class="rounded-2xl glass-card p-6">
-          <div class="flex flex-col items-center text-center gap-2">
-            <div class="text-4xl mb-2">🖼️</div>
-            <h2 class="text-xl font-semibold text-foreground">Single Image Upload</h2>
-            <p class="text-xs text-muted-foreground">Drag & drop or</p>
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Single Image -->
+            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-6">
+                <div class="flex flex-col items-center text-center gap-2">
+                    <div class="text-4xl">🖼️</div>
+                    <h2 class="text-xl font-semibold">Single Image Upload</h2>
+                    <p class="text-xs text-slate-200/80">or</p>
 
-            <button
-              id="upload-single"
-              class="mt-1 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2"
-            >
-              <span class="text-lg">📁</span> Browse File
-            </button>
+                    <button id="single-upload-btn" 
+                        class="mt-1 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-medium px-4 py-2 transition-colors">
+                        <span class="text-lg">📁</span> Browse File
+                    </button>
 
-            <input
-              id="single-file-input"
-              type="file"
-              accept=".jpg,.jpeg,.png,.webp"
-              class="hidden"
-            />
+                    <input id="single-file-input"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        class="file-input-hidden"
+                    />
 
-            <p class="mt-3 text-xs text-muted-foreground">
-              Supports: JPG, PNG, WEBP (Max 10MB)
-            </p>
-          </div>
+                    <p class="mt-3 text-xs text-slate-300">
+                        Supports: JPG, PNG, WEBP (Max 10MB)
+                    </p>
+                </div>
+            </div>
+
+            <!-- PRO Batch Upload -->
+            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-6">
+                <div class="flex flex-col items-center text-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <div class="text-4xl">🗝️</div>
+                        <span class="ml-1 text-[10px] font-bold bg-yellow-300 text-slate-900 px-2 py-0.5 rounded-full">PRO</span>
+                    </div>
+                    <h2 class="text-xl font-semibold">$2.00 PRO Batch Upload</h2>
+                    <p class="max-w-md text-sm text-slate-200/90">
+                        Unlock for Lifetime access to all PRO features and future website tools. Your support truly means the world to us 😊
+                    </p>
+                    <p class="text-xs text-slate-200/80">or</p>
+
+                    <button id="batch-upload-btn"
+                        class="mt-1 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-medium px-4 py-2 transition-colors">
+                        <span class="text-lg">📁</span> Browse Files
+                    </button>
+
+                    <input id="batch-file-input"
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.webp"
+                        class="file-input-hidden"
+                    />
+
+                    <p class="mt-3 text-xs text-slate-300">
+                        Supports: JPG, PNG, WEBP (Max 10MB each)
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <!-- PRO Batch Upload -->
-        <div class="rounded-2xl glass-card p-6">
-          <div class="flex flex-col items-center text-center gap-2">
-            <div class="flex items-center gap-2 mb-2">
-              <div class="text-4xl">🗝️</div>
-              <span class="text-[10px] font-bold bg-accent text-accent-foreground px-2 py-0.5 rounded-full">
-                PRO
-              </span>
-            </div>
-            <h2 class="text-xl font-semibold text-foreground">$2.00 PRO Batch Upload</h2>
-            <p class="max-w-md text-sm text-muted-foreground">
-              Unlock for Lifetime access to all PRO features and future website tools. 
-              Your support truly means the world to us 😊
-            </p>
-            <p class="text-xs text-muted-foreground">Drag & drop or</p>
-
-            <button
-              id="upload-batch"
-              class="mt-1 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2"
-            >
-              <span class="text-lg">📁</span> Browse Files
-            </button>
-
-            <input
-              id="batch-file-input"
-              type="file"
-              multiple
-              accept=".jpg,.jpeg,.png,.webp"
-              class="hidden"
-            />
-
-            <p class="mt-3 text-xs text-muted-foreground">
-              Supports: JPG, PNG, WEBP (Max 10MB each)
-            </p>
-          </div>
+        <!-- Error toast (initially hidden) -->
+        <div id="error-toast" class="mt-4 rounded-lg bg-red-500/15 border border-red-500/30 text-red-200 px-4 py-2 toast-transition hidden opacity-0 transform -translate-y-2">
+            <span id="error-message"></span>
         </div>
-      </div>
 
-      <!-- Error Display -->
-      <div id="error-display" class="mt-4 rounded-lg bg-destructive/15 border border-destructive/30 text-destructive-foreground px-4 py-2 hidden">
-        <!-- Error message will be inserted here -->
-      </div>
-
-      <!-- Features Section -->
-      <section class="mt-12">
-        <h3 class="text-center text-3xl font-bold text-foreground mb-8">
-          Why Use ResizedImage.com?
-        </h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="rounded-2xl glass-card p-6 text-center">
-            <div class="text-3xl mb-2">⚡</div>
-            <div class="font-semibold text-lg text-foreground mb-2">Lightning Fast</div>
-            <p class="text-muted-foreground">Resize images in seconds without compromising quality using our optimized algorithms.</p>
-          </div>
-          <div class="rounded-2xl glass-card p-6 text-center">
-            <div class="text-3xl mb-2">🔒</div>
-            <div class="font-semibold text-lg text-foreground mb-2">Secure & Private</div>
-            <p class="text-muted-foreground">Your images are processed in your browser and never uploaded to our servers.</p>
-          </div>
-          <div class="rounded-2xl glass-card p-6 text-center">
-            <div class="text-3xl mb-2">🎚️</div>
-            <div class="font-semibold text-lg text-foreground mb-2">Advanced Controls</div>
-            <p class="text-muted-foreground">Precise dimension control, quality adjustment, and multiple format options.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Testimonials Section -->
-      <section class="mt-16">
-        <h3 class="text-center text-3xl font-bold text-foreground mb-2">
-          Trusted by Thousands
-        </h3>
-        <p class="text-center text-muted-foreground mb-12">
-          See what our users say about ResizedImage.com
-        </p>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="text-center">
-            <div class="text-4xl mb-3">👩‍🎨</div>
-            <div class="flex justify-center mb-3">
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
+        <!-- Why Use Row -->
+        <section class="mt-12">
+            <h3 class="text-center text-3xl font-bold">Why Use ResizedImage.com?</h3>
+            <div class="mt-8 grid md:grid-cols-3 gap-6">
+                <div class="feature-card rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <div class="font-semibold text-lg">Lightning Fast</div>
+                    <p class="mt-2 text-slate-200/90">Resize images in seconds without compromising quality using our optimized algorithms.</p>
+                </div>
+                <div class="feature-card rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <div class="font-semibold text-lg">Secure & Private</div>
+                    <p class="mt-2 text-slate-200/90">Your images are processed in your browser and never uploaded to our servers.</p>
+                </div>
+                <div class="feature-card rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                    <div class="text-3xl mb-2">🎚️</div>
+                    <div class="font-semibold text-lg">Advanced Controls</div>
+                    <p class="mt-2 text-slate-200/90">Precise dimension control, quality adjustment, and multiple format options.</p>
+                </div>
             </div>
-            <p class="text-muted-foreground mb-4 italic text-lg leading-relaxed">"This tool is incredible! I resize hundreds of images daily for my clients, and ResizedImage.com makes it so easy. The quality is always perfect."</p>
-            <div class="font-semibold text-foreground">Sarah Chen</div>
-            <div class="text-sm text-muted-foreground">Graphic Designer</div>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl mb-3">👨‍💼</div>
-            <div class="flex justify-center mb-3">
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
+        </section>
+        
+        <!-- Upload Stats Section -->
+        <section class="mt-16 text-center">
+            <h3 class="text-2xl font-bold mb-6">Trusted by Thousands</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-blue-400">500K+</div>
+                    <div class="text-slate-300">Images Resized</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-green-400">99%</div>
+                    <div class="text-slate-300">Satisfaction Rate</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-purple-400">2s</div>
+                    <div class="text-slate-300">Avg. Processing Time</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-yellow-400">100%</div>
+                    <div class="text-slate-300">Browser Processing</div>
+                </div>
             </div>
-            <p class="text-muted-foreground mb-4 italic text-lg leading-relaxed">"The batch upload feature is a game-changer. I can resize all our product images in minutes instead of hours. Worth every penny!"</p>
-            <div class="font-semibold text-foreground">Mike Rodriguez</div>
-            <div class="text-sm text-muted-foreground">E-commerce Manager</div>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl mb-3">✍️</div>
-            <div class="flex justify-center mb-3">
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-              <span class="text-accent text-lg">⭐</span>
-            </div>
-            <p class="text-muted-foreground mb-4 italic text-lg leading-relaxed">"Simple, fast, and secure. I love that my images never leave my browser. Perfect for optimizing blog images without quality loss."</p>
-            <div class="font-semibold text-foreground">Emily Watson</div>
-            <div class="text-sm text-muted-foreground">Blogger</div>
-          </div>
-        </div>
-      </section>
+        </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-muted-foreground">
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <a href="/terms" class="hover:text-foreground transition-colors">Terms</a>
-        <a href="/privacy" class="hover:text-foreground transition-colors">Privacy</a>
-        <a href="/contact" class="hover:text-foreground transition-colors">Contact</a>
-        <a href="/api" class="hover:text-foreground transition-colors">API</a>
-        <a href="/blog" class="hover:text-foreground transition-colors">Blog</a>
-      </div>
-      <p class="text-center mt-4 opacity-80">
-        © 2023 ResizedImage.com — All rights reserved
-      </p>
-    </footer>
-  </div>
+    <!-- Testimonials -->
+    <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-16">
+        <h3 class="text-center text-2xl font-bold mb-8">What Our Users Say</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 text-xl">★★★★★</div>
+                </div>
+                <p class="text-slate-200/90">"The fastest image resizer I've ever used. Perfect for my social media content!"</p>
+                <div class="mt-4 text-sm text-slate-400">- Sarah, Photographer</div>
+            </div>
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 text-xl">★★★★★</div>
+                </div>
+                <p class="text-slate-200/90">"Love that my images never leave my browser. Privacy matters!"</p>
+                <div class="mt-4 text-sm text-slate-400">- Michael, Designer</div>
+            </div>
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 text-xl">★★★★★</div>
+                </div>
+                <p class="text-slate-200/90">"Batch processing saved me hours of work. Well worth the $2!"</p>
+                <div class="mt-4 text-sm text-slate-400">- Jessica, Blogger</div>
+            </div>
+        </div>
+    </section>
 
-  <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-    <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-6xl">
-   <div class="p-8">
-   <div class="flex justify-between items-center mb-4">
-   <h2 class="text-2xl font-bold">Image Editor</h2>
-   <div>
-   <button id="rotate-left-btn" class="editor-modal-button p-2 rounded-full text-white">
-   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
-   </button>
-   <button id="rotate-right-btn" class="editor-modal-button p-2 rounded-full text-white">
-   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
-   </button>
-   <button id="crop-btn" class="editor-modal-button p-2 rounded-full text-white">
-   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
-   </button>
-   </div>
-   </div>
-   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-   <div class="md:col-span-2">
-   <div id="preview-panel" class="bg-gray-700 h-96 flex items-center justify-center relative overflow-hidden">
-   <p>Image Preview</p>
-   </div>
-   </div>
-   <div>
-   <div class="mb-4">
-   <div class="flex border-b">
-   <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
-   <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
-   <button class="tab-btn" data-tab="social-media">Social Media</button>
-   </div>
-   </div>
-   <div id="by-size" class="tab-content">
-   <div class="flex items-center mb-4">
-   <label for="width" class="w-16">Width:</label>
-   <input type="number" id="width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   </div>
-   <div class="flex items-center mb-4">
-   <label for="height" class="w-16">Height:</label>
-   <input type="number" id="height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   </div>
-   <div class="flex items-center">
-   <input type="checkbox" id="lock-aspect" class="mr-2" checked>
-   <label for="lock-aspect">Lock aspect ratio</label>
-   </div>
-   <div class="flex items-center mt-4">
-   <input type="checkbox" id="background-fill" class="mr-2">
-   <label for="background-fill">Background Fill</label>
-   <input type="color" id="background-color" class="ml-2" value="#ffffff">
-   </div>
-   </div>
-   <div class="flex items-center mt-4">
-   <label for="as-percentage-units" class="mr-2">Units:</label>
-   <select id="as-percentage-units" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   <option value="px">Pixels</option>
-   <option value="in">Inches</option>
-   <option value="cm">Centimeters</option>
-   <option value="mm">Millimeters</option>
-   </select>
-   </div>
-   <div id="as-percentage" class="tab-content hidden">
-   <div class="flex items-center mb-4">
-   <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
-   <span id="percentage-value">100%</span>
-   </div>
-   </div>
-   <div id="social-media" class="tab-content hidden">
-   <div class="flex items-center mb-4">
-   <label for="social-platform" class="mr-2">Platform:</label>
-   <select id="social-platform" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white">
-   <option value="">Select Platform</option>
-   </select>
-   </div>
-   <div class="flex items-center mb-4">
-   <label for="social-preset" class="mr-2">Preset:</label>
-   <select id="social-preset" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white" disabled>
-   <option value="">Select Preset</option>
-   </select>
-   </div>
-   </div>
-   <div class="mt-8">
-   <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
-   <div class="flex items-center mb-4">
-   <label for="target-size" class="mr-2">Target File Size (optional):</label>
-   <input type="number" id="target-size" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   <select id="target-size-unit" class="border border-gray-600 rounded px-2 py-1 ml-2 bg-gray-800 text-white">
-   <option value="KB">KB</option>
-   <option value="MB">MB</option>
-   </select>
-   </div>
-   <div class="flex items-center mb-4">
-   <label for="format" class="mr-2">Save Image As:</label>
-   <select id="format" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   <option value="original">Original</option>
-   <option value="jpeg">JPEG</option>
-   <option value="png">PNG</option>
-   <option value="webp">WebP</option>
-   </select>
-   </div>
-   <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">
-   Export
-   </button>
-   </div>
-   </div>
-   </div>
-   </div>
-   </div>
-  </div>
-  <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-   <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-4xl">
-   <div class="p-8">
-   <h2 class="text-2xl font-bold">Crop Image</h2>
-   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-   <div class="md:col-span-2">
-   <div id="crop-preview-panel" class="bg-gray-700 h-96 relative overflow-hidden">
-   </div>
-   </div>
-   <div>
-   <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
-   <div class="flex items-center mb-4">
-   <label for="crop-width" class="w-16">Width:</label>
-   <input type="number" id="crop-width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   </div>
-   <div class="flex items-center mb-4">
-   <label for="crop-height" class="w-16">Height:</label>
-   <input type="number" id="crop-height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   </div>
-   <div class="flex items-center mb-4">
-   <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
-   <select id="aspect-ratio" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
-   <option value="free">Freeform</option>
-   <option value="original">Original</option>
-   <option value="custom">Custom</option>
-   <option value="1:1">1:1 (Square)</option>
-   <option value="4:3">4:3 (Monitor)</option>
-   <option value="16:9">16:9 (Widescreen)</option>
-   <option value="16:10">16:10</option>
-   <option value="3:2">3:2</option>
-   <option value="5:4">5:4</option>
-   <option value="2:1">2:1</option>
-   <option value="3:1">3:1</option>
-   <option value="4:1">4:1</option>
-   <option value="14:9">14:9</option>
-   <option value="19:10">19:10</option>
-   <option value="21:9">21:9 (Cinemascope)</option>
-   <option value="32:9">32:9 (Super Ultra Wide)</option>
-   </select>
-   </div>
-   <button id="apply-crop-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-2">
-   Crop
-   </button>
-   <button id="reset-crop-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full">
-   Reset
-   </button>
-   </div>
-   </div>
-   </div>
-   </div>
-  </div>
- <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
- <script>
-  document.addEventListener('DOMContentLoaded', () => {
-   const $=id=>document.getElementById(id);
-  
-   const editorModal = $('editor-modal');
-   const uploadSingleBtn = $('upload-single');
-   const uploadBatchBtn = $('upload-batch');
-   const singleFileInput = $('single-file-input');
-   const batchFileInput = $('batch-file-input');
-   const errorDisplay = $('error-display');
-  
-   async function isPro() {
-    try {
-    const r = await fetch('/me', { credentials: 'include' });
-    return (await r.json()).pro;
-    } catch {
-    return false;
-    }
-   }
-  
-   async function redeem() {
-    const t = new URLSearchParams(location.search).get('token');
-    if (!t) return;
-    const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
-    const j = await r.json();
-    if (j.ok) {
-    const u = new URL(location.href);
-    u.searchParams.delete('token');
-    history.replaceState({}, '', u);
-    }
-   }
-  
-   (async () => {
-    await redeem();
-    if (await isPro()) {
-    // Assuming there's an element with id 'unlock-pro-btn' in the new design
-    const unlockProBtn = $('unlock-pro-btn');
-    if (unlockProBtn) {
-    unlockProBtn.style.display = 'none';
-    }
-    }
-   })();
-  
-   const unlockProBtn = $('unlock-pro-btn');
-   if (unlockProBtn) {
-     unlockProBtn.onclick = () => location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
-   }
-  
-   // Event listeners for upload buttons
-   uploadSingleBtn.addEventListener('click', () => singleFileInput.click());
-   uploadBatchBtn.addEventListener('click', async () => {
-     if (await isPro()) {
-       batchFileInput.click();
-     } else {
-       location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
-     }
-   });
-  
-   // Event listener for single file input change
-   singleFileInput.addEventListener('change', async (e) => {
-     const file = e.target.files[0];
-     if (file) {
-       const formData = new FormData();
-       formData.append('file', file);
-       const res = await fetch('/api/upload', {
-         method: 'POST',
-         body: formData,
-       });
-       const json = await res.json();
-       if (json.success) {
-         const previewPanel = $('preview-panel');
-         const img = new Image();
-         img.onload = () => {
-           originalWidth = img.width;
-           originalHeight = img.height;
-           widthInput.value = originalWidth;
-           heightInput.value = originalHeight;
-           percentageSlider.value = 100;
-           percentageValueSpan.textContent = '100%';
-         };
-         img.src = URL.createObjectURL(file);
-         previewPanel.innerHTML = '';
-         previewPanel.appendChild(img);
-         editorModal.classList.remove('hidden');
-       } else {
-         errorDisplay.textContent = json.error || 'File upload failed.';
-         errorDisplay.classList.remove('hidden');
-       }
-     }
-   });
-  
-   // Event listener for batch file input change
-   batchFileInput.addEventListener('change', (e) => {
-     const files = e.target.files;
-     if (files.length > 0) {
-       editorModal.classList.remove('hidden');
-     }
-   });
-  
-   const widthInput = $('width');
-   const heightInput = $('height');
-   const lockAspectCheckbox = $('lock-aspect');
-   let originalWidth, originalHeight;
-  
-   function handleResize() {
-    if (!originalWidth || !originalHeight) return;
-  
-    const aspectRatio = originalWidth / originalHeight;
-    const width = parseInt(widthInput.value);
-    const height = parseInt(heightInput.value);
-  
-    if (lockAspectCheckbox.checked) {
-    if (document.activeElement === widthInput) {
-    heightInput.value = Math.round(width / aspectRatio);
-    } else {
-    widthInput.value = Math.round(height * aspectRatio);
-    }
-    }
-   }
-  
-   widthInput.addEventListener('input', handleResize);
-   heightInput.addEventListener('input', handleResize);
-  
-   const percentageSlider = $('percentage-slider');
-   const percentageValueSpan = $('percentage-value');
-   const unitsSelect = $('as-percentage-units'); // Corrected ID
-  
-   function updatePercentageResize() {
-    if (!originalWidth || !originalHeight) return;
-  
-    const percentage = parseInt(percentageSlider.value);
-    percentageValueSpan.textContent = `${percentage}%`;
-  
-    const newWidth = Math.round(originalWidth * (percentage / 100));
-    const newHeight = Math.round(originalHeight * (percentage / 100));
-  
-    widthInput.value = newWidth;
-    heightInput.value = newHeight;
-   }
-  
-   percentageSlider.addEventListener('input', updatePercentageResize);
-   unitsSelect.addEventListener('change', () => {
-    console.log(`Selected unit: ${unitsSelect.value}`);
-   });
-  
-   const socialPlatformSelect = $('social-platform');
-   const socialPresetSelect = $('social-preset');
-  
-   let socialPresets = {};
-  
-   async function loadSocialPresets() {
-    const res = await fetch('/socialPresets.json');
-    socialPresets = await res.json();
-    for (const platform in socialPresets) {
-    const option = document.createElement('option');
-    option.value = platform;
-    option.textContent = platform;
-    socialPlatformSelect.appendChild(option);
-    }
-   }
-  
-   socialPlatformSelect.addEventListener('change', () => {
-    const platform = socialPlatformSelect.value;
-    socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
-    if (platform) {
-    socialPresetSelect.disabled = false;
-    for (const preset in socialPresets[platform]) {
-    const option = document.createElement('option');
-    option.value = preset;
-    option.textContent = preset;
-    socialPresetSelect.appendChild(option);
-    }
-    } else {
-    socialPresetSelect.disabled = true;
-    }
-   });
-  
-   socialPresetSelect.addEventListener('change', () => {
-    const platform = socialPlatformSelect.value;
-    const preset = socialPresetSelect.value;
-    if (platform && preset) {
-    const { width, height } = socialPresets[platform][preset];
-    widthInput.value = width;
-    heightInput.value = height;
-    }
-   });
-  
-   loadSocialPresets();
-  
-   const exportBtn = $('export-btn');
-  
-   exportBtn.addEventListener('click', async () => {
-    const image = $('preview-panel').querySelector('img');
-    if (!image || !image.src) {
-      alert('Please upload an image first.');
-      return;
-    }
-  
-    let fileBlob;
-    let endpoint = '/process';
-    const form = new FormData();
-  
-    if (cropper) {
-      const cropData = cropper.getData(true);
-      form.append('cropData', JSON.stringify(cropData));
-      endpoint = '/process-crop';
-      fileBlob = await new Promise(resolve => {
-        cropper.getCroppedCanvas().toBlob(resolve);
-      });
-    } else {
-      fileBlob = await (await fetch(image.src)).blob();
-    }
-  
-    form.append('file', fileBlob);
-    if ($('background-fill').checked) {
-      form.append('backgroundColor', $('background-color').value);
-    }
-    form.append('w', widthInput.value);
-    form.append('h', heightInput.value);
-    form.append('fmt', $('format').value);
-    form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
-    form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
-    form.append('targetSize', $('target-size').value);
-    form.append('targetSizeUnit', $('target-size-unit').value);
-  
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      body: form,
-    });
-  
-    if (res.ok) {
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resized.${$('format').value}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else {
-      alert('An error occurred during processing.');
-    }
-   });
-  
-   const cropBtn = $('crop-btn');
-   const cropModal = $('crop-modal');
-   const cropPreviewPanel = $('crop-preview-panel');
-   const applyCropBtn = $('apply-crop-btn');
-   const resetCropBtn = $('reset-crop-btn');
-   const aspectRatioSelect = $('aspect-ratio');
-   const cropWidthInput = $('crop-width');
-   const cropHeightInput = $('crop-height');
-   let cropper;
-   let currentImageSrc = '';
-  
-   cropBtn.addEventListener('click', () => {
-    const image = $('preview-panel').querySelector('img');
-    if (!image) {
-      alert('Please upload an image first.');
-      return;
-    }
-    currentImageSrc = image.src;
-    cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%; max-height: 100%;">`;
-    const cropImage = cropPreviewPanel.querySelector('img');
-  
-    cropModal.classList.remove('hidden');
-  
-    if (cropper) {
-      cropper.destroy();
-    }
-    cropper = new Cropper(cropImage, {
-      viewMode: 1,
-      autoCropArea: 1,
-      background: false,
-      crop(event) {
-        cropWidthInput.value = Math.round(event.detail.width);
-        cropHeightInput.value = Math.round(event.detail.height);
-      },
-    });
-   });
-  
-   applyCropBtn.addEventListener('click', () => {
-    if (cropper) {
-      const croppedCanvas = cropper.getCroppedCanvas();
-      const image = $('preview-panel').querySelector('img');
-      image.src = croppedCanvas.toDataURL();
-      cropper.destroy();
-      cropper = null;
-      cropModal.classList.add('hidden');
-    }
-   });
-  
-   resetCropBtn.addEventListener('click', () => {
-    if (cropper) {
-    cropper.reset();
-    }
-   });
-  
-   aspectRatioSelect.addEventListener('change', () => {
-    if (cropper) {
-      const aspectRatio = aspectRatioSelect.value;
-      if (aspectRatio === 'free') {
-        cropper.setAspectRatio(NaN);
-      } else if (aspectRatio === 'original') {
-        const cropImage = cropPreviewPanel.querySelector('img');
-        if (cropImage) {
-          cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
-        }
-      } else {
-        const [w, h] = aspectRatio.split(':');
-        cropper.setAspectRatio(w / h);
-      }
-    }
-   });
-  
-   const rotateLeftBtn = $('rotate-left-btn');
-   const rotateRightBtn = $('rotate-right-btn');
-  
-   rotateLeftBtn.addEventListener('click', () => {
-     const image = $('preview-panel').querySelector('img');
-     if (image) {
-       const canvas = document.createElement('canvas');
-       const ctx = canvas.getContext('2d');
-       canvas.width = image.height;
-       canvas.height = image.width;
-       ctx.translate(canvas.width / 2, canvas.height / 2);
-       ctx.rotate(-Math.PI / 2);
-       ctx.drawImage(image, -image.width / 2, -image.height / 2);
-       image.src = canvas.toDataURL();
-     }
-   });
-  
-   rotateRightBtn.addEventListener('click', () => {
-     const image = $('preview-panel').querySelector('img');
-     if (image) {
-       const canvas = document.createElement('canvas');
-       const ctx = canvas.getContext('2d');
-       canvas.width = image.height;
-       canvas.height = image.width;
-       ctx.translate(canvas.width / 2, canvas.height / 2);
-       ctx.rotate(Math.PI / 2);
-       ctx.drawImage(image, -image.width / 2, -image.height / 2);
-       image.src = canvas.toDataURL();
-     }
-   });
-  
-   const hamburgerButton = $('hamburger-button');
-   const mobileMenu = $('mobile-menu');
-  
-   hamburgerButton.addEventListener('click', () => {
-     mobileMenu.classList.toggle('hidden');
-   });
-  
-   // Tab functionality for editor modal
-   const tabButtons = document.querySelectorAll('.tab-btn');
-   const tabContents = document.querySelectorAll('.tab-content');
-  
-   tabButtons.forEach(button => {
-     button.addEventListener('click', () => {
-       tabButtons.forEach(btn => btn.classList.remove('active-tab'));
-       tabContents.forEach(content => content.classList.add('hidden'));
-  
-       button.classList.add('active-tab');
-       $(`${button.dataset.tab}`).classList.remove('hidden');
-     });
-   });
-  });
- </script>
+    <!-- Footer -->
+    <footer class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-slate-300/90 mt-16">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="/terms" class="hover:text-white">Terms</a>
+            <a href="/privacy" class="hover:text-white">Privacy</a>
+            <a href="/contact" class="hover:text-white">Contact</a>
+            <a href="/api" class="hover:text-white">API</a>
+            <a href="/blog" class="hover:text-white">Blog</a>
+        </div>
+        <p class="text-center mt-4 opacity-80">© 2023 ResizedImage.com — All rights reserved</p>
+    </footer>
+
+    <!-- Modals from original index.html -->
+    <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+      <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-6xl">
+     <div class="p-8">
+     <div class="flex justify-between items-center mb-4">
+     <h2 class="text-2xl font-bold">Image Editor</h2>
+     <div>
+     <button id="rotate-left-btn" class="editor-modal-button p-2 rounded-full text-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+     </button>
+     <button id="rotate-right-btn" class="editor-modal-button p-2 rounded-full text-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l.01.01M17.657 17.657l.01.01M6.343 17.657l.01-.01m11.303-11.303l.01-.01"></path></svg>
+     </button>
+     <button id="crop-btn" class="editor-modal-button p-2 rounded-full text-white">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 5.879A3 3 0 0116.243 5h1.514a3 3 0 013 3v1.514a3 3 0 01-.879 2.121l-8.242 8.242a3 3 0 01-2.121.879H7.5a3 3 0 01-3-3v-1.514a3 3 0 01.879-2.121l8.242-8.242zM12 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+     </button>
+     </div>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+     <div class="md:col-span-2">
+     <div id="preview-panel" class="bg-gray-700 h-96 flex items-center justify-center relative overflow-hidden">
+     <p>Image Preview</p>
+     </div>
+     </div>
+     <div>
+     <div class="mb-4">
+     <div class="flex border-b">
+     <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
+     <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
+     <button class="tab-btn" data-tab="social-media">Social Media</button>
+     </div>
+     </div>
+     <div id="by-size" class="tab-content">
+     <div class="flex items-center mb-4">
+     <label for="width" class="w-16">Width:</label>
+     <input type="number" id="width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="height" class="w-16">Height:</label>
+     <input type="number" id="height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     </div>
+     <div class="flex items-center">
+     <input type="checkbox" id="lock-aspect" class="mr-2" checked>
+     <label for="lock-aspect">Lock aspect ratio</label>
+     </div>
+     <div class="flex items-center mt-4">
+     <input type="checkbox" id="background-fill" class="mr-2">
+     <label for="background-fill">Background Fill</label>
+     <input type="color" id="background-color" class="ml-2" value="#ffffff">
+     </div>
+     </div>
+     <div class="flex items-center mt-4">
+     <label for="as-percentage-units" class="mr-2">Units:</label>
+     <select id="as-percentage-units" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     <option value="px">Pixels</option>
+     <option value="in">Inches</option>
+     <option value="cm">Centimeters</option>
+     <option value="mm">Millimeters</option>
+     </select>
+     </div>
+     <div id="as-percentage" class="tab-content hidden">
+     <div class="flex items-center mb-4">
+     <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
+     <span id="percentage-value">100%</span>
+     </div>
+     </div>
+     <div id="social-media" class="tab-content hidden">
+     <div class="flex items-center mb-4">
+     <label for="social-platform" class="mr-2">Platform:</label>
+     <select id="social-platform" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white">
+     <option value="">Select Platform</option>
+     </select>
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="social-preset" class="mr-2">Preset:</label>
+     <select id="social-preset" class="border border-gray-600 rounded px-2 py-1 w-full bg-gray-800 text-white" disabled>
+     <option value="">Select Preset</option>
+     </select>
+     </div>
+     </div>
+     <div class="mt-8">
+     <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
+     <div class="flex items-center mb-4">
+     <label for="target-size" class="mr-2">Target File Size (optional):</label>
+     <input type="number" id="target-size" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     <select id="target-size-unit" class="border border-gray-600 rounded px-2 py-1 ml-2 bg-gray-800 text-white">
+     <option value="KB">KB</option>
+     <option value="MB">MB</option>
+     </select>
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="format" class="mr-2">Save Image As:</label>
+     <select id="format" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     <option value="original">Original</option>
+     <option value="jpeg">JPEG</option>
+     <option value="png">PNG</option>
+     <option value="webp">WebP</option>
+     </select>
+     </div>
+     <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">
+     Export
+     </button>
+     </div>
+     </div>
+     </div>
+     </div>
+     </div>
+    </div>
+    <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+     <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-4xl">
+     <div class="p-8">
+     <h2 class="text-2xl font-bold">Crop Image</h2>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+     <div class="md:col-span-2">
+     <div id="crop-preview-panel" class="bg-gray-700 h-96 relative overflow-hidden">
+     </div>
+     </div>
+     <div>
+     <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
+     <div class="flex items-center mb-4">
+     <label for="crop-width" class="w-16">Width:</label>
+     <input type="number" id="crop-width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="crop-height" class="w-16">Height:</label>
+     <input type="number" id="crop-height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
+     <select id="aspect-ratio" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     <option value="free">Freeform</option>
+     <option value="original">Original</option>
+     <option value="custom">Custom</option>
+     <option value="1:1">1:1 (Square)</option>
+     <option value="4:3">4:3 (Monitor)</option>
+     <option value="16:9">16:9 (Widescreen)</option>
+     <option value="16:10">16:10</option>
+     <option value="3:2">3:2</option>
+     <option value="5:4">5:4</option>
+     <option value="2:1">2:1</option>
+     <option value="3:1">3:1</option>
+     <option value="4:1">4:1</option>
+     <option value="14:9">14:9</option>
+     <option value="19:10">19:10</option>
+     <option value="21:9">21:9 (Cinemascope)</option>
+     <option value="32:9">32:9 (Super Ultra Wide)</option>
+     </select>
+     </div>
+     <button id="apply-crop-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-2">
+     Crop
+     </button>
+     <button id="reset-crop-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full">
+     Reset
+     </button>
+     </div>
+     </div>
+     </div>
+     </div>
+    </div>
+
+    <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const MAX_MB = 10;
+            // Renamed from uploadSingleBtn to singleUploadBtn
+            const singleUploadBtn = document.getElementById('single-upload-btn');
+            // Renamed from uploadBatchBtn to batchUploadBtn
+            const batchUploadBtn = document.getElementById('batch-upload-btn');
+            const singleFileInput = document.getElementById('single-file-input');
+            const batchFileInput = document.getElementById('batch-file-input');
+            // Renamed from errorDisplay to errorToast and errorMessage
+            const errorToast = document.getElementById('error-toast');
+            const errorMessage = document.getElementById('error-message');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileNav = document.getElementById('mobile-nav');
+
+            // Modals and editor elements (from original JS)
+            const editorModal = document.getElementById('editor-modal');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            const lockAspectCheckbox = document.getElementById('lock-aspect');
+            let originalWidth, originalHeight;
+            const percentageSlider = document.getElementById('percentage-slider');
+            const percentageValueSpan = document.getElementById('percentage-value');
+            const unitsSelect = document.getElementById('as-percentage-units');
+            const socialPlatformSelect = document.getElementById('social-platform');
+            const socialPresetSelect = document.getElementById('social-preset');
+            let socialPresets = {};
+            const exportBtn = document.getElementById('export-btn');
+            const cropBtn = document.getElementById('crop-btn');
+            const cropModal = document.getElementById('crop-modal');
+            const cropPreviewPanel = document.getElementById('crop-preview-panel');
+            const applyCropBtn = document.getElementById('apply-crop-btn');
+            const resetCropBtn = document.getElementById('reset-crop-btn');
+            const aspectRatioSelect = document.getElementById('aspect-ratio');
+            const cropWidthInput = document.getElementById('crop-width');
+            const cropHeightInput = document.getElementById('crop-height');
+            let cropper;
+            let currentImageSrc = '';
+            const rotateLeftBtn = document.getElementById('rotate-left-btn');
+            const rotateRightBtn = document.getElementById('rotate-right-btn');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileMenuBtn.contains(event.target) && !mobileNav.contains(event.target)) {
+                    mobileNav.classList.remove('active');
+                }
+            });
+            
+            // Button triggers file input
+            singleUploadBtn.addEventListener('click', function() {
+                singleFileInput.click();
+            });
+            
+            batchUploadBtn.addEventListener('click', async function() {
+                if (await isPro()) {
+                    batchFileInput.click();
+                } else {
+                    location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
+                }
+            });
+            
+            // File validation function
+            function validateFiles(files) {
+                const tooBig = Array.from(files).find(f => f.size > MAX_MB * 1024 * 1024);
+                if (tooBig) {
+                    return `"${tooBig.name}" is over ${MAX_MB}MB. Please pick smaller files.`;
+                }
+                return null;
+            }
+            
+            // Show error toast
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorToast.classList.remove('hidden');
+                setTimeout(() => {
+                    errorToast.classList.remove('opacity-0');
+                    errorToast.classList.remove('-translate-y-2');
+                }, 10);
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    hideError();
+                }, 5000);
+            }
+            
+            // Hide error toast
+            function hideError() {
+                errorToast.classList.add('opacity-0');
+                errorToast.classList.add('-translate-y-2');
+                setTimeout(() => {
+                    errorToast.classList.add('hidden');
+                }, 300); // Match transition duration
+            }
+
+            // isPro and redeem functions (from original JS)
+            async function isPro() {
+                try {
+                    const r = await fetch('/me', { credentials: 'include' });
+                    return (await r.json()).pro;
+                } catch {
+                    return false;
+                }
+            }
+           
+            async function redeem() {
+                const t = new URLSearchParams(location.search).get('token');
+                if (!t) return;
+                const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
+                const j = await r.json();
+                if (j.ok) {
+                    const u = new URL(location.href);
+                    u.searchParams.delete('token');
+                    history.replaceState({}, '', u);
+                }
+            }
+           
+            (async () => {
+                await redeem();
+                if (await isPro()) {
+                    const unlockProBtn = document.getElementById('unlock-pro-btn');
+                    if (unlockProBtn) {
+                        unlockProBtn.style.display = 'none';
+                    }
+                }
+            })();
+
+            // Event listener for single file input change (from original JS)
+            singleFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const validationError = validateFiles([file]);
+                    if (validationError) {
+                        showError(validationError);
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const res = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                        const previewPanel = document.getElementById('preview-panel');
+                        const img = new Image();
+                        img.onload = () => {
+                            originalWidth = img.width;
+                            originalHeight = img.height;
+                            widthInput.value = originalWidth;
+                            heightInput.value = originalHeight;
+                            percentageSlider.value = 100;
+                            percentageValueSpan.textContent = '100%';
+                        };
+                        img.src = URL.createObjectURL(file);
+                        previewPanel.innerHTML = '';
+                        previewPanel.appendChild(img);
+                        editorModal.classList.remove('hidden');
+                    } else {
+                        showError(json.error || 'File upload failed.');
+                    }
+                }
+            });
+           
+            // Event listener for batch file input change (from original JS)
+            batchFileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    const validationError = validateFiles(files);
+                    if (validationError) {
+                        showError(validationError);
+                        return;
+                    }
+                    // For batch, we might want to show a different modal or process differently
+                    // For now, just open the editor modal as a placeholder
+                    editorModal.classList.remove('hidden');
+                }
+            });
+
+            // Resize functionality (from original JS)
+            function handleResize() {
+                if (!originalWidth || !originalHeight) return;
+           
+                const aspectRatio = originalWidth / originalHeight;
+                const width = parseInt(widthInput.value);
+                const height = parseInt(heightInput.value);
+           
+                if (lockAspectCheckbox.checked) {
+                    if (document.activeElement === widthInput) {
+                        heightInput.value = Math.round(width / aspectRatio);
+                    } else {
+                        widthInput.value = Math.round(height * aspectRatio);
+                    }
+                }
+            }
+           
+            widthInput.addEventListener('input', handleResize);
+            heightInput.addEventListener('input', handleResize);
+           
+            function updatePercentageResize() {
+                if (!originalWidth || !originalHeight) return;
+           
+                const percentage = parseInt(percentageSlider.value);
+                percentageValueSpan.textContent = `${percentage}%`;
+           
+                const newWidth = Math.round(originalWidth * (percentage / 100));
+                const newHeight = Math.round(originalHeight * (percentage / 100));
+           
+                widthInput.value = newWidth;
+                heightInput.value = newHeight;
+            }
+           
+            percentageSlider.addEventListener('input', updatePercentageResize);
+            unitsSelect.addEventListener('change', () => {
+                console.log(`Selected unit: ${unitsSelect.value}`);
+            });
+           
+            // Social presets (from original JS)
+            async function loadSocialPresets() {
+                const res = await fetch('/socialPresets.json');
+                socialPresets = await res.json();
+                for (const platform in socialPresets) {
+                    const option = document.createElement('option');
+                    option.value = platform;
+                    option.textContent = platform;
+                    socialPlatformSelect.appendChild(option);
+                }
+            }
+           
+            socialPlatformSelect.addEventListener('change', () => {
+                const platform = socialPlatformSelect.value;
+                socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
+                if (platform) {
+                    socialPresetSelect.disabled = false;
+                    for (const preset in socialPresets[platform]) {
+                        const option = document.createElement('option');
+                        option.value = preset;
+                        option.textContent = preset;
+                        socialPresetSelect.appendChild(option);
+                    }
+                } else {
+                    socialPresetSelect.disabled = true;
+                }
+            });
+           
+            socialPresetSelect.addEventListener('change', () => {
+                const platform = socialPlatformSelect.value;
+                const preset = socialPresetSelect.value;
+                if (platform && preset) {
+                    const { width, height } = socialPresets[platform][preset];
+                    widthInput.value = width;
+                    heightInput.value = height;
+                }
+            });
+           
+            loadSocialPresets();
+           
+            // Export functionality (from original JS)
+            exportBtn.addEventListener('click', async () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (!image || !image.src) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+           
+                let fileBlob;
+                let endpoint = '/process';
+                const form = new FormData();
+           
+                if (cropper) {
+                    const cropData = cropper.getData(true);
+                    form.append('cropData', JSON.stringify(cropData));
+                    endpoint = '/process-crop';
+                    fileBlob = await new Promise(resolve => {
+                        cropper.getCroppedCanvas().toBlob(resolve);
+                    });
+                } else {
+                    fileBlob = await (await fetch(image.src)).blob();
+                }
+           
+                form.append('file', fileBlob);
+                if (document.getElementById('background-fill').checked) {
+                    form.append('backgroundColor', document.getElementById('background-color').value);
+                }
+                form.append('w', widthInput.value);
+                form.append('h', heightInput.value);
+                form.append('fmt', document.getElementById('format').value);
+                form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
+                form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
+                form.append('targetSize', document.getElementById('target-size').value);
+                form.append('targetSizeUnit', document.getElementById('target-size-unit').value);
+           
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    body: form,
+                });
+           
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `resized.${document.getElementById('format').value}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert('An error occurred during processing.');
+                }
+            });
+           
+            // Crop functionality (from original JS)
+            cropBtn.addEventListener('click', () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (!image) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+                currentImageSrc = image.src;
+                cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%; max-height: 100%;">`;
+                const cropImage = cropPreviewPanel.querySelector('img');
+           
+                cropModal.classList.remove('hidden');
+           
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropper = new Cropper(cropImage, {
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    background: false,
+                    crop(event) {
+                        cropWidthInput.value = Math.round(event.detail.width);
+                        cropHeightInput.value = Math.round(event.detail.height);
+                    },
+                });
+            });
+           
+            applyCropBtn.addEventListener('click', () => {
+                if (cropper) {
+                    const croppedCanvas = cropper.getCroppedCanvas();
+                    const image = document.getElementById('preview-panel').querySelector('img');
+                    image.src = croppedCanvas.toDataURL();
+                    cropper.destroy();
+                    cropper = null;
+                    cropModal.classList.add('hidden');
+                }
+            });
+           
+            resetCropBtn.addEventListener('click', () => {
+                if (cropper) {
+                    cropper.reset();
+                }
+            });
+           
+            aspectRatioSelect.addEventListener('change', () => {
+                if (cropper) {
+                    const aspectRatio = aspectRatioSelect.value;
+                    if (aspectRatio === 'free') {
+                        cropper.setAspectRatio(NaN);
+                    } else if (aspectRatio === 'original') {
+                        const cropImage = cropPreviewPanel.querySelector('img');
+                        if (cropImage) {
+                            cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
+                        }
+                    } else {
+                        const [w, h] = aspectRatio.split(':');
+                        cropper.setAspectRatio(w / h);
+                    }
+                }
+            });
+           
+            // Rotate functionality (from original JS)
+            rotateLeftBtn.addEventListener('click', () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (image) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = image.height;
+                    canvas.height = image.width;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.drawImage(image, -image.width / 2, -image.height / 2);
+                    image.src = canvas.toDataURL();
+                }
+            });
+           
+            rotateRightBtn.addEventListener('click', () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (image) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = image.height;
+                    canvas.height = image.width;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(Math.PI / 2);
+                    ctx.drawImage(image, -image.width / 2, -image.height / 2);
+                    image.src = canvas.toDataURL();
+                }
+            });
+           
+            // Tab functionality for editor modal (from original JS)
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+                    tabContents.forEach(content => content.classList.add('hidden'));
+           
+                    button.classList.add('active-tab');
+                    document.getElementById(button.dataset.tab).classList.remove('hidden');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

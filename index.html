@@ -467,6 +467,7 @@
    const uploadBatchBtn = $('upload-batch');
    const singleFileInput = $('single-file-input');
    const batchFileInput = $('batch-file-input');
+   const errorDisplay = $('error-display');
   
    async function isPro() {
     try {
@@ -492,7 +493,11 @@
    (async () => {
     await redeem();
     if (await isPro()) {
-    $('unlock-pro-btn').style.display = 'none';
+    // Assuming there's an element with id 'unlock-pro-btn' in the new design
+    const unlockProBtn = $('unlock-pro-btn');
+    if (unlockProBtn) {
+    unlockProBtn.style.display = 'none';
+    }
     }
    })();
   
@@ -501,6 +506,7 @@
      unlockProBtn.onclick = () => location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
    }
   
+   // Event listeners for upload buttons
    uploadSingleBtn.addEventListener('click', () => singleFileInput.click());
    uploadBatchBtn.addEventListener('click', async () => {
      if (await isPro()) {
@@ -509,7 +515,8 @@
        location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
      }
    });
-
+  
+   // Event listener for single file input change
    singleFileInput.addEventListener('change', async (e) => {
      const file = e.target.files[0];
      if (file) {
@@ -535,10 +542,14 @@
          previewPanel.innerHTML = '';
          previewPanel.appendChild(img);
          editorModal.classList.remove('hidden');
+       } else {
+         errorDisplay.textContent = json.error || 'File upload failed.';
+         errorDisplay.classList.remove('hidden');
        }
      }
    });
-
+  
+   // Event listener for batch file input change
    batchFileInput.addEventListener('change', (e) => {
      const files = e.target.files;
      if (files.length > 0) {
@@ -572,7 +583,7 @@
   
    const percentageSlider = $('percentage-slider');
    const percentageValueSpan = $('percentage-value');
-   const unitsSelect = $('as-percentage-units');
+   const unitsSelect = $('as-percentage-units'); // Corrected ID
   
    function updatePercentageResize() {
     if (!originalWidth || !originalHeight) return;
@@ -589,13 +600,8 @@
   
    percentageSlider.addEventListener('input', updatePercentageResize);
    unitsSelect.addEventListener('change', () => {
-    // For now, just update the display, actual unit conversion will happen on the backend
     console.log(`Selected unit: ${unitsSelect.value}`);
    });
-  
-   // Update originalWidth and originalHeight when a new image is loaded
-   // This part needs to be integrated into the single upload onchange handler
-   // I will modify the single upload onchange handler to include this.
   
    const socialPlatformSelect = $('social-platform');
    const socialPresetSelect = $('social-preset');
@@ -756,7 +762,6 @@
       if (aspectRatio === 'free') {
         cropper.setAspectRatio(NaN);
       } else if (aspectRatio === 'original') {
-        // Need to get original dimensions of the image in the crop modal
         const cropImage = cropPreviewPanel.querySelector('img');
         if (cropImage) {
           cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
@@ -798,380 +803,28 @@
        image.src = canvas.toDataURL();
      }
    });
+  
    const hamburgerButton = $('hamburger-button');
    const mobileMenu = $('mobile-menu');
   
    hamburgerButton.addEventListener('click', () => {
      mobileMenu.classList.toggle('hidden');
    });
+  
+   // Tab functionality for editor modal
+   const tabButtons = document.querySelectorAll('.tab-btn');
+   const tabContents = document.querySelectorAll('.tab-content');
+  
+   tabButtons.forEach(button => {
+     button.addEventListener('click', () => {
+       tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+       tabContents.forEach(content => content.classList.add('hidden'));
+  
+       button.classList.add('active-tab');
+       $(`${button.dataset.tab}`).classList.remove('hidden');
+     });
+   });
   });
  </script>
-</body>
-</html>
-
-  <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const $ = id => document.getElementById(id);
-
-      const editorModal = $('editor-modal');
-      const uploadSingleBtn = $('upload-single');
-      const uploadBatchBtn = $('upload-batch');
-      const singleFileInput = $('single-file-input');
-      const batchFileInput = $('batch-file-input');
-      const errorDisplay = $('error-display');
-
-      async function isPro() {
-        try {
-          const r = await fetch('/me', { credentials: 'include' });
-          return (await r.json()).pro;
-        } catch {
-          return false;
-        }
-      }
-
-      async function redeem() {
-        const t = new URLSearchParams(location.search).get('token');
-        if (!t) return;
-        const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
-        const j = await r.json();
-        if (j.ok) {
-          const u = new URL(location.href);
-          u.searchParams.delete('token');
-          history.replaceState({}, '', u);
-        }
-      }
-
-      (async () => {
-        await redeem();
-        if (await isPro()) {
-          // Assuming there's an element with id 'unlock-pro-btn' in the new design
-          const unlockProBtn = $('unlock-pro-btn');
-          if (unlockProBtn) {
-            unlockProBtn.style.display = 'none';
-          }
-        }
-      })();
-
-      // Event listeners for upload buttons
-      uploadSingleBtn.addEventListener('click', () => singleFileInput.click());
-      uploadBatchBtn.addEventListener('click', async () => {
-        if (await isPro()) {
-          batchFileInput.click();
-        } else {
-          location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
-        }
-      });
-
-      // Event listener for single file input change
-      singleFileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const formData = new FormData();
-          formData.append('file', file);
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-          const json = await res.json();
-          if (json.success) {
-            const previewPanel = $('preview-panel');
-            const img = new Image();
-            img.onload = () => {
-              originalWidth = img.width;
-              originalHeight = img.height;
-              widthInput.value = originalWidth;
-              heightInput.value = originalHeight;
-              percentageSlider.value = 100;
-              percentageValueSpan.textContent = '100%';
-            };
-            img.src = URL.createObjectURL(file);
-            previewPanel.innerHTML = '';
-            previewPanel.appendChild(img);
-            editorModal.classList.remove('hidden');
-          } else {
-            errorDisplay.textContent = json.error || 'File upload failed.';
-            errorDisplay.classList.remove('hidden');
-          }
-        }
-      });
-
-      // Event listener for batch file input change
-      batchFileInput.addEventListener('change', (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-          editorModal.classList.remove('hidden');
-        }
-      });
-
-      const widthInput = $('width');
-      const heightInput = $('height');
-      const lockAspectCheckbox = $('lock-aspect');
-      let originalWidth, originalHeight;
-
-      function handleResize() {
-        if (!originalWidth || !originalHeight) return;
-
-        const aspectRatio = originalWidth / originalHeight;
-        const width = parseInt(widthInput.value);
-        const height = parseInt(heightInput.value);
-
-        if (lockAspectCheckbox.checked) {
-          if (document.activeElement === widthInput) {
-            heightInput.value = Math.round(width / aspectRatio);
-          } else {
-            widthInput.value = Math.round(height * aspectRatio);
-          }
-        }
-      }
-
-      widthInput.addEventListener('input', handleResize);
-      heightInput.addEventListener('input', handleResize);
-
-      const percentageSlider = $('percentage-slider');
-      const percentageValueSpan = $('percentage-value');
-      const unitsSelect = $('as-percentage-units'); // Corrected ID
-
-      function updatePercentageResize() {
-        if (!originalWidth || !originalHeight) return;
-
-        const percentage = parseInt(percentageSlider.value);
-        percentageValueSpan.textContent = `${percentage}%`;
-
-        const newWidth = Math.round(originalWidth * (percentage / 100));
-        const newHeight = Math.round(originalHeight * (percentage / 100));
-
-        widthInput.value = newWidth;
-        heightInput.value = newHeight;
-      }
-
-      percentageSlider.addEventListener('input', updatePercentageResize);
-      unitsSelect.addEventListener('change', () => {
-        console.log(`Selected unit: ${unitsSelect.value}`);
-      });
-
-      const socialPlatformSelect = $('social-platform');
-      const socialPresetSelect = $('social-preset');
-
-      let socialPresets = {};
-
-      async function loadSocialPresets() {
-        const res = await fetch('/socialPresets.json');
-        socialPresets = await res.json();
-        for (const platform in socialPresets) {
-          const option = document.createElement('option');
-          option.value = platform;
-          option.textContent = platform;
-          socialPlatformSelect.appendChild(option);
-        }
-      }
-
-      socialPlatformSelect.addEventListener('change', () => {
-        const platform = socialPlatformSelect.value;
-        socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
-        if (platform) {
-          socialPresetSelect.disabled = false;
-          for (const preset in socialPresets[platform]) {
-            const option = document.createElement('option');
-            option.value = preset;
-            option.textContent = preset;
-            socialPresetSelect.appendChild(option);
-          }
-        } else {
-          socialPresetSelect.disabled = true;
-        }
-      });
-
-      socialPresetSelect.addEventListener('change', () => {
-        const platform = socialPlatformSelect.value;
-        const preset = socialPresetSelect.value;
-        if (platform && preset) {
-          const { width, height } = socialPresets[platform][preset];
-          widthInput.value = width;
-          heightInput.value = height;
-        }
-      });
-
-      loadSocialPresets();
-
-      const exportBtn = $('export-btn');
-
-      exportBtn.addEventListener('click', async () => {
-        const image = $('preview-panel').querySelector('img');
-        if (!image || !image.src) {
-          alert('Please upload an image first.');
-          return;
-        }
-
-        let fileBlob;
-        let endpoint = '/process';
-        const form = new FormData();
-
-        if (cropper) {
-          const cropData = cropper.getData(true);
-          form.append('cropData', JSON.stringify(cropData));
-          endpoint = '/process-crop';
-          fileBlob = await new Promise(resolve => {
-            cropper.getCroppedCanvas().toBlob(resolve);
-          });
-        } else {
-          fileBlob = await (await fetch(image.src)).blob();
-        }
-
-        form.append('file', fileBlob);
-        if ($('background-fill').checked) {
-          form.append('backgroundColor', $('background-color').value);
-        }
-        form.append('w', widthInput.value);
-        form.append('h', heightInput.value);
-        form.append('fmt', $('format').value);
-        form.append('q', 0.85); // Will be replaced with dynamic quality adjustment
-        form.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
-        form.append('targetSize', $('target-size').value);
-        form.append('targetSizeUnit', $('target-size-unit').value);
-
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          body: form,
-        });
-
-        if (res.ok) {
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `resized.${$('format').value}`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          alert('An error occurred during processing.');
-        }
-      });
-
-      const cropBtn = $('crop-btn');
-      const cropModal = $('crop-modal');
-      const cropPreviewPanel = $('crop-preview-panel');
-      const applyCropBtn = $('apply-crop-btn');
-      const resetCropBtn = $('reset-crop-btn');
-      const aspectRatioSelect = $('aspect-ratio');
-      const cropWidthInput = $('crop-width');
-      const cropHeightInput = $('crop-height');
-      let cropper;
-      let currentImageSrc = '';
-
-      cropBtn.addEventListener('click', () => {
-        const image = $('preview-panel').querySelector('img');
-        if (!image) {
-          alert('Please upload an image first.');
-          return;
-        }
-        currentImageSrc = image.src;
-        cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%; max-height: 100%;">`;
-        const cropImage = cropPreviewPanel.querySelector('img');
-
-        cropModal.classList.remove('hidden');
-
-        if (cropper) {
-          cropper.destroy();
-        }
-        cropper = new Cropper(cropImage, {
-          viewMode: 1,
-          autoCropArea: 1,
-          background: false,
-          crop(event) {
-            cropWidthInput.value = Math.round(event.detail.width);
-            cropHeightInput.value = Math.round(event.detail.height);
-          },
-        });
-      });
-
-      applyCropBtn.addEventListener('click', () => {
-        if (cropper) {
-          const croppedCanvas = cropper.getCroppedCanvas();
-          const image = $('preview-panel').querySelector('img');
-          image.src = croppedCanvas.toDataURL();
-          cropper.destroy();
-          cropper = null;
-          cropModal.classList.add('hidden');
-        }
-      });
-
-      resetCropBtn.addEventListener('click', () => {
-        if (cropper) {
-          cropper.reset();
-        }
-      });
-
-      aspectRatioSelect.addEventListener('change', () => {
-        if (cropper) {
-          const aspectRatio = aspectRatioSelect.value;
-          if (aspectRatio === 'free') {
-            cropper.setAspectRatio(NaN);
-          } else if (aspectRatio === 'original') {
-            const cropImage = cropPreviewPanel.querySelector('img');
-            if (cropImage) {
-              cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
-            }
-          } else {
-            const [w, h] = aspectRatio.split(':');
-            cropper.setAspectRatio(w / h);
-          }
-        }
-      });
-
-      const rotateLeftBtn = $('rotate-left-btn');
-      const rotateRightBtn = $('rotate-right-btn');
-
-      rotateLeftBtn.addEventListener('click', () => {
-        const image = $('preview-panel').querySelector('img');
-        if (image) {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = image.height;
-          canvas.height = image.width;
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate(-Math.PI / 2);
-          ctx.drawImage(image, -image.width / 2, -image.height / 2);
-          image.src = canvas.toDataURL();
-        }
-      });
-
-      rotateRightBtn.addEventListener('click', () => {
-        const image = $('preview-panel').querySelector('img');
-        if (image) {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = image.height;
-          canvas.height = image.width;
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate(Math.PI / 2);
-          ctx.drawImage(image, -image.width / 2, -image.height / 2);
-          image.src = canvas.toDataURL();
-        }
-      });
-
-      const hamburgerButton = $('hamburger-button');
-      const mobileMenu = $('mobile-menu');
-
-      hamburgerButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-      });
-
-      // Tab functionality for editor modal
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      const tabContents = document.querySelectorAll('.tab-content');
-
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          tabButtons.forEach(btn => btn.classList.remove('active-tab'));
-          tabContents.forEach(content => content.classList.add('hidden'));
-
-          button.classList.add('active-tab');
-          $(`${button.dataset.tab}`).classList.remove('hidden');
-        });
-      });
-    });
-  </script>
 </body>
 </html>

@@ -153,16 +153,22 @@ body {
   background-color: #2d3748;
 }
 .tab-btn {
-  padding: 0.5rem 1rem;
-  border-bottom: 2px solid transparent;
-  color: #a0aec0; /* Light gray for inactive tabs */
-}
-.tab-btn.active-tab {
-  border-color: #667eea; /* Blue for active tab */
-  color: white;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-align: left;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+    transition: var(--transition-smooth);
 }
 .tab-btn:hover {
-  color: white;
+    background-color: hsl(var(--muted));
+    color: hsl(var(--foreground));
+}
+.tab-btn.active-tab {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    font-weight: 600;
 }
 /* Ensure cropper is visible and centered */
 .cropper-container {
@@ -173,15 +179,37 @@ body {
 }
 /* Adjust modal background for better visibility */
 #editor-modal .bg-white, #crop-modal .bg-white {
-  background-color: #2d3748; /* Darker background for modals */
-  color: white;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
 }
 /* Adjust input field styles for visibility */
-.border-gray-300 {
-  border-color: #4a5568;
+.form-input {
+    background-color: hsl(var(--input));
+    border: 1px solid hsl(var(--border) / 0.2);
+    border-radius: var(--radius);
+    color: hsl(var(--foreground));
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    transition: var(--transition-smooth);
 }
-.bg-gray-200 {
-  background-color: #4a5568;
+.form-input:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+}
+.form-select {
+    background-color: hsl(var(--input));
+    border: 1px solid hsl(var(--border) / 0.2);
+    border-radius: var(--radius);
+    color: hsl(var(--foreground));
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    transition: var(--transition-smooth);
+}
+.form-select:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
 }
 #editor-modal {
   z-index: 1000; /* Ensure editor modal is above other content */

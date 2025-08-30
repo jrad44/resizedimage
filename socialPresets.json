@@ -1,67 +1,32 @@
 {
   "Facebook": {
-    "Profile Picture": { "width": 170, "height": 170 },
+    "Profile Picture": { "width": 180, "height": 180 },
     "Cover Photo": { "width": 820, "height": 312 },
-    "Post Image": { "width": 1200, "height": 630 },
-    "Story": { "width": 1080, "height": 1920 }
-  },
-  "Instagram": {
-    "Profile Picture": { "width": 320, "height": 320 },
-    "Square Post": { "width": 1080, "height": 1080 },
-    "Landscape Post": { "width": 1080, "height": 566 },
-    "Portrait Post": { "width": 1080, "height": 1350 },
-    "Story": { "width": 1080, "height": 1920 }
+    "Shared Image": { "width": 1200, "height": 630 },
+    "Event Image": { "width": 1920, "height": 1080 }
   },
   "Twitter": {
     "Profile Photo": { "width": 400, "height": 400 },
     "Header Photo": { "width": 1500, "height": 500 },
-    "In-Stream Photo": { "width": 1200, "height": 675 }
+    "In-stream Photo": { "width": 1024, "height": 512 }
   },
-  "YouTube": {
-    "Profile Picture": { "width": 800, "height": 800 },
-    "Channel Art": { "width": 2560, "height": 1440 },
-    "Video Thumbnail": { "width": 1280, "height": 720 }
-  },
-  "Discord": {
-    "Server Icon": { "width": 512, "height": 512 },
-    "Profile Banner": { "width": 600, "height": 240 }
-  },
-  "Etsy": {
-    "Shop Icon": { "width": 500, "height": 500 },
-    "Listing Image": { "width": 2000, "height": 1500 }
-  },
-  "Shopify": {
-    "Product Image": { "width": 2048, "height": 2048 },
-    "Collection Banner": { "width": 2000, "height": 750 }
-  },
-  "eBay": {
-    "Product Image": { "width": 1600, "height": 1600 },
-    "Store Banner": { "width": 1200, "height": 270 }
+  "Instagram": {
+    "Profile Picture": { "width": 110, "height": 110 },
+    "Photo": { "width": 1080, "height": 1080 },
+    "Stories": { "width": 1080, "height": 1920 }
   },
   "LinkedIn": {
-    "Profile Photo": { "width": 400, "height": 400 },
+    "Profile Picture": { "width": 400, "height": 400 },
     "Background Photo": { "width": 1584, "height": 396 },
-    "Post Image": { "width": 1200, "height": 627 }
+    "Shared Image": { "width": 1200, "height": 627 }
   },
   "Pinterest": {
     "Profile Picture": { "width": 165, "height": 165 },
-    "Standard Pin": { "width": 1000, "height": 1500 }
+    "Pin": { "width": 1000, "height": 1500 }
   },
-  "Reddit": {
-    "Profile Banner": { "width": 1920, "height": 384 },
-    "Community Icon": { "width": 256, "height": 256 }
-  },
-  "Threads": {
-    "Profile Picture": { "width": 320, "height": 320 },
-    "Post Image": { "width": 1080, "height": 1080 }
-  },
-  "TikTok": {
-    "Profile Photo": { "width": 200, "height": 200 },
+  "YouTube": {
+    "Profile Picture": { "width": 800, "height": 800 },
+    "Channel Cover Photo": { "width": 2560, "height": 1440 },
     "Video Thumbnail": { "width": 1280, "height": 720 }
-  },
-  "X": {
-    "Profile Photo": { "width": 400, "height": 400 },
-    "Header Photo": { "width": 1500, "height": 500 },
-    "In-Stream Photo": { "width": 1200, "height": 675 }
   }
 }

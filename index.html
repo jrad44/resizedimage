@@ -1,1351 +1,963 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Resizer Editor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @keyframes bgShift {
-      0% { transform: translate3d(0,0,0); }
-      50% { transform: translate3d(-2%,1%,0); }
-      100% { transform: translate3d(0,0,0); }
-    }
-    .bg-noise {
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence baseFrequency="0.75" numOctaves="2"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>');
-    }
-    .crop-outside-darken {
-      box-shadow: 
-        var(--left) var(--top) 0 0 rgba(0,0,0,.45) inset,
-        var(--right) var(--top) 0 0 rgba(0,0,0,.45) inset,
-        var(--left) var(--bottom) 0 0 rgba(0,0,0,.45) inset,
-        var(--right) var(--bottom) 0 0 rgba(0,0,0,.45) inset;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResizedImage - Resize Images Effortlessly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'bg-shift': 'bgShift 28s linear infinite',
+                    },
+                    keyframes: {
+                        bgShift: {
+                            '0%': { transform: 'translate3d(0,0,0)' },
+                            '50%': { transform: 'translate3d(-2%,1%,0)' },
+                            '100%': { transform: 'translate3d(0,0,0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="new-design.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4695148041573402"
+       crossorigin="anonymous"></script>
+    <style type="text/css">
+        
+
+        /* New styles from provided HTML */
+        .grain-overlay {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence baseFrequency="0.75" numOctaves="2"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>');
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-nav-menu {
+                display: none;
+            }
+            
+            .mobile-nav-menu.active {
+                display: flex;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(12px);
+                border-top: 1px solid rgba(255, 255, 255, 0.15);
+                flex-direction: column;
+                padding: 1rem;
+                z-index: 10;
+            }
+        }
+        
+        .file-input-hidden {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toast-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
 </head>
-<body class="min-h-screen text-slate-50 relative overflow-hidden">
-  <!-- Background Glow -->
-  <div class="pointer-events-none absolute inset-0 -z-10">
-    <div class="absolute inset-0 opacity-90" style="
-      background: radial-gradient(1200px 800px at 20% 15%, rgba(118,142,255,0.22) 0%, transparent 60%),
-                  radial-gradient(900px 700px at 80% 85%, rgba(255,179,120,0.22) 0%, transparent 55%);
-      animation: bgShift 28s linear infinite;
-      background-size: 120% 120%;
-    "></div>
-    <div class="absolute inset-0 mix-blend-soft-light opacity-[0.08] bg-noise"></div>
-  </div>
-
-  <!-- Top bar -->
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 pb-2">
-    <div class="flex items-center justify-between rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2">
-      <div class="flex items-center gap-3">
-        <button onclick="window.history.back()" class="size-8 rounded-lg bg-white/15 grid place-items-center hover:bg-white/25">←</button>
-        <div class="font-semibold tracking-tight">Image Resizer</div>
-        <div id="original-size" class="text-xs text-white/70 ml-2 hidden">Original: <span id="original-dimensions"></span> • <span id="original-bytes"></span></div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="document.getElementById('file-input').click()" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15">Replace Image</button>
-        <button id="export-btn" disabled class="px-4 py-1.5 rounded-full text-sm font-semibold bg-indigo-400/90 hover:bg-indigo-400 text-slate-900 disabled:opacity-50">Export</button>
-      </div>
+<body class="min-h-screen text-slate-50 relative overflow-x-hidden">
+    <!-- Background: big soft radial glows + subtle grain -->
+    <div class="pointer-events-none absolute inset-0 -z-10">
+        <div class="absolute inset-0 opacity-90" 
+             style="background: radial-gradient(1200px 800px at 20% 15%, rgba(118,142,255,0.22) 0%, transparent 60%), radial-gradient(900px 700px at 80% 85%, rgba(255,179,120,0.22) 0%, transparent 55%); background-size: 120% 120%;"
+             class="animate-bg-shift">
+        </div>
+        <div class="absolute inset-0 mix-blend-soft-light opacity-[0.08] grain-overlay"></div>
     </div>
-  </div>
 
-  <!-- Editor surface -->
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-10">
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-stretch">
-      <!-- Left: preview/canvas card -->
-      <div id="drop-zone" class="rounded-[28px] border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-4 min-h-[420px] flex items-center justify-center relative overflow-hidden">
-        <div id="empty-state" class="text-center text-white/80">
-          <div class="text-7xl mb-4">🖼️</div>
-          <div class="text-lg font-semibold">Drop an image here</div>
-          <div class="text-sm opacity-80 mt-1">or</div>
-          <button onclick="document.getElementById('file-input').click()" class="mt-3 inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-medium px-4 py-2">📁 Choose File</button>
-          <div class="text-xs opacity-70 mt-3">Supports: JPG, PNG, WEBP (Max 10MB)</div>
-        </div>
-        
-        <div id="image-container" class="w-full h-[62vh] lg:h-[70vh] flex items-center justify-center relative hidden">
-          <!-- Toolbar over preview -->
-          <div class="absolute top-3 right-3 z-10 flex items-center gap-2">
-            <button onclick="showCropModal()" title="Crop" class="size-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 grid place-items-center backdrop-blur">✂️</button>
-            <button onclick="rotateLeft()" title="Rotate Left" class="size-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 grid place-items-center backdrop-blur">⟲</button>
-            <button onclick="rotateRight()" title="Rotate Right" class="size-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 grid place-items-center backdrop-blur">⟳</button>
-            <button onclick="resetImage()" title="Reset" class="size-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 grid place-items-center backdrop-blur">↺</button>
-          </div>
-          <canvas id="preview-canvas" class="rounded-xl border border-white/10 shadow-inner"></canvas>
-        </div>
-        
-        <input id="file-input" type="file" accept=".jpg,.jpeg,.png,.webp" class="hidden">
-        <canvas id="export-canvas" class="hidden"></canvas>
-      </div>
+    <!-- Mobile menu button (hidden on desktop) -->
+    <div class="md:hidden fixed top-4 right-4 z-30">
+        <button id="mobile-menu-btn" class="p-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/15">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
 
-      <!-- Right: frosted control panel -->
-      <div class="rounded-[24px] border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-5">
-        <div class="text-lg font-semibold mb-3">Editing Tools</div>
-
-        <!-- Mode -->
-        <div class="text-sm text-white/90 mb-1.5">Mode</div>
-        <div id="mode-tabs" class="inline-flex rounded-full border border-white/20 bg-white/5 p-1">
-          <button data-mode="size" class="px-3 py-1.5 text-sm rounded-full bg-white/90 text-slate-900">By Size</button>
-          <button data-mode="percent" class="px-3 py-1.5 text-sm rounded-full text-white/80 hover:bg-white/10">As %</button>
-          <button data-mode="preset" class="px-3 py-1.5 text-sm rounded-full text-white/80 hover:bg-white/10">Social</button>
-        </div>
-
-        <!-- Controls per mode -->
-        <div id="size-controls" class="mt-4 space-y-3">
-          <div class="grid grid-cols-2 gap-3 items-end">
-            <div>
-              <div class="text-sm text-white/90 mb-1.5">Width</div>
-              <div class="flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-3 h-10">
-                <input id="width-input" inputmode="numeric" placeholder="auto" class="bg-transparent outline-none w-full">
-                <span class="text-white/60 text-xs">px</span>
-              </div>
-            </div>
-            <div>
-              <div class="text-sm text-white/90 mb-1.5">Height</div>
-              <div class="flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-3 h-10">
-                <input id="height-input" inputmode="numeric" placeholder="auto" class="bg-transparent outline-none w-full">
-                <span class="text-white/60 text-xs">px</span>
-              </div>
-            </div>
-          </div>
-          <label class="flex items-center gap-2 text-sm select-none">
-            <input id="lock-aspect" type="checkbox" checked class="h-4 w-4">
-            <span class="text-white/90">Lock aspect ratio</span>
-          </label>
-        </div>
-
-        <div id="percent-controls" class="mt-4 hidden">
-          <div class="flex items-center justify-between text-sm mb-1.5">
-            <span class="text-white/90">Scale: <span id="percent-value">100</span>%</span>
-            <span class="text-white/70">100</span>
-          </div>
-          <input id="percent-slider" type="range" min="10" max="200" step="1" value="100" class="w-full accent-indigo-300">
-        </div>
-
-        <div id="preset-controls" class="mt-4 space-y-3 hidden">
-          <div>
-            <div class="text-sm text-white/90 mb-1.5">Preset</div>
-            <select id="preset-select" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3">
-              <option value="insta_square">Instagram Post (1080×1080)</option>
-              <option value="insta_story">Instagram Story (1080×1920)</option>
-              <option value="yt_thumb">YouTube Thumbnail (1280×720)</option>
-              <option value="twitter_post">X/Twitter Post (1600×900)</option>
-              <option value="linkedin_banner">LinkedIn Cover (1584×396)</option>
-              <option value="pinterest">Pinterest (1000×1500)</option>
-            </select>
-          </div>
-          <div class="text-sm text-white/90 mb-1.5">Fit</div>
-          <div class="inline-flex rounded-full border border-white/20 bg-white/5 p-1">
-            <button data-fit="contain" class="px-3 py-1.5 text-sm rounded-full bg-white/90 text-slate-900">Contain</button>
-            <button data-fit="cover" class="px-3 py-1.5 text-sm rounded-full text-white/80 hover:bg-white/10">Cover</button>
-            <button data-fit="exact" class="px-3 py-1.5 text-sm rounded-full text-white/80 hover:bg-white/10">Exact</button>
-          </div>
-        </div>
-
-        <div class="mt-6">
-          <div class="text-sm text-white/90 mb-1.5">Background Fill</div>
-          <div class="flex items-center gap-2">
-            <input id="bg-color" type="color" value="#0b1220" class="h-9 w-14 rounded-md border border-white/20 bg-transparent">
-            <span class="text-xs text-white/70">Used for letterbox (Contain) and JPEG transparency</span>
-          </div>
-        </div>
-
-        <!-- Export -->
-        <div class="mt-6 pt-5 border-t border-white/10">
-          <div class="text-base font-semibold mb-3">Export</div>
-          <div>
-            <div class="text-sm text-white/90 mb-1.5">Format</div>
-            <select id="format-select" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3">
-              <option value="image/jpeg">JPEG (.jpg)</option>
-              <option value="image/png">PNG (.png)</option>
-              <option value="image/webp">WEBP (.webp)</option>
-              <option value="original">Original (auto)</option>
-            </select>
-          </div>
-          <div class="mt-3">
-            <div class="flex items-center justify-between text-sm mb-1.5">
-              <span class="text-white/90">Quality <span id="quality-value">92</span>%</span>
-              <span class="text-white/70">92</span>
-            </div>
-            <input id="quality-slider" type="range" min="10" max="100" step="1" value="92" class="w-full accent-indigo-300">
-          </div>
-
-          <div class="mt-3">
-            <label class="flex items-center gap-2 text-sm select-none">
-              <input id="target-size-toggle" type="checkbox" class="h-4 w-4">
-              <span class="text-white/90">Target file size</span>
-            </label>
-            <div id="target-size-controls" class="mt-2 grid grid-cols-[1fr_auto] gap-2 items-end hidden">
-              <div>
-                <div class="text-sm text-white/90 mb-1.5">Size</div>
-                <div class="flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-3 h-10">
-                  <input id="target-size-input" inputmode="numeric" class="bg-transparent outline-none w-full">
-                  <span id="target-size-unit" class="text-white/60 text-xs">KB</span>
+    <!-- Top Nav -->
+    <nav class="sticky top-0 z-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center justify-between rounded-full bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2">
+                <div class="flex items-center gap-3">
+                    <div class="size-8 rounded-lg bg-white/15 grid place-items-center">📷</div>
+                    <a href="/" class="font-semibold tracking-tight">ResizedImage.com</a>
                 </div>
-              </div>
-              <select id="target-unit-select" class="h-10 px-3 rounded-lg bg-white/10 border border-white/20">
-                <option>KB</option>
-                <option>MB</option>
-              </select>
+                <div class="hidden md:flex items-center gap-6 text-sm text-slate-200">
+                    <a href="/resizer" class="hover:text-white" aria-label="Image Resizer">Image Resizer</a>
+                    <a href="/pdf" class="hover:text-white" aria-label="PDF Tools">PDF Tools</a>
+                    <a href="/bg-remover" class="hover:text-white" aria-label="Background Remover">BG Remover</a>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="/login" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15" aria-label="Login">
+                        Login
+                    </a>
+                    <a href="/signup" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15" aria-label="Sign Up">
+                        Sign Up
+                    </a>
+                    <a id="go-pro-btn" href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02" class="ml-1 px-3 py-1.5 rounded-full text-sm font-semibold bg-indigo-400/90 hover:bg-indigo-400 text-slate-900" aria-label="Go Pro">
+                        Go Pro
+                    </a>
+                </div>
+                
+                <!-- Mobile menu (hidden on desktop) -->
+                <div class="md:hidden mobile-nav-menu" id="mobile-nav">
+                    <div class="flex flex-col space-y-4 py-4">
+                        <a href="/resizer" class="hover:text-white" aria-label="Image Resizer">Image Resizer</a>
+                        <a href="/pdf" class="hover:text-white" aria-label="PDF Tools">PDF Tools</a>
+                        <a href="/bg-remover" class="hover:text-white" aria-label="Background Remover">BG Remover</a>
+                        <div class="flex flex-col space-y-2 pt-4 border-t border-white/15">
+                            <a href="/login" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15 text-center">
+                                Login
+                            </a>
+                            <a href="/signup" class="px-3 py-1.5 rounded-full text-sm bg-white/10 hover:bg-white/15 border border-white/15 text-center">
+                                Sign Up
+                            </a>
+                            <a href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02" class="px-3 py-1.5 rounded-full text-sm font-semibold bg-indigo-400/90 hover:bg-indigo-400 text-slate-900 text-center">
+                                Go Pro
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+        </div>
+    </nav>
 
-          <div class="mt-4 grid grid-cols-2 gap-2">
-            <div class="rounded-lg bg-white/8 border border-white/15 px-3 py-2">
-              <div class="text-[11px] uppercase tracking-wide text-white/60">Output</div>
-              <div id="output-dimensions" class="text-sm">—</div>
+    <!-- Hero -->
+    <header class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center pt-16 md:pt-24">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
+            ResizedImage
+        </h1>
+        <p class="mt-3 text-slate-200/90 text-lg">
+            Resize images effortlessly for free
+        </p>
+    </header>
+
+    <!-- Upload Cards -->
+    <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-10">
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Main Upload Card -->
+            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8">
+                <div class="flex flex-col items-center text-center gap-4">
+                    <h2 class="text-2xl font-bold tracking-tight">
+                        Upload an Image to Get Started
+                    </h2>
+                    <p class="text-slate-200/90 max-w-md">
+                        Drag and drop a file or click the button below to select an image from your device.
+                    </p>
+                    
+                    <button id="single-upload-btn"
+                        class="mt-2 inline-flex items-center gap-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-900 font-semibold px-6 py-3 text-lg transition-colors shadow-lg shadow-blue-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        Select Image
+                    </button>
+
+                    <input id="single-file-input"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        class="file-input-hidden"
+                    />
+
+                    <p class="mt-2 text-xs text-slate-300">
+                        Supports: JPG, PNG, WEBP (Max 10MB)
+                    </p>
+                </div>
             </div>
-            <div class="rounded-lg bg-white/8 border border-white/15 px-3 py-2">
-              <div class="text-[11px] uppercase tracking-wide text-white/60">Estimated</div>
-              <div id="estimated-size" class="text-sm">—</div>
+
+            <!-- PRO Batch Upload -->
+            <div class="glass-card rounded-2xl border border-white/15 bg-white/8 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8">
+                <div class="flex flex-col items-center text-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-semibold">Batch Upload</h2>
+                        <span class="text-[10px] font-bold bg-yellow-300 text-slate-900 px-2 py-0.5 rounded-full">PRO</span>
+                    </div>
+                    <p class="text-slate-200/90 text-sm max-w-md">
+                        Process multiple images at once. Lifetime access for a small one-time payment.
+                    </p>
+                    
+                    <button id="batch-upload-btn"
+                        class="mt-2 inline-flex items-center gap-2 rounded-lg bg-purple-500 hover:bg-purple-400 text-slate-900 font-medium px-4 py-2 transition-colors shadow-lg shadow-purple-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13 7H7v6h6V7z" />
+                            <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3 1a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1H5z" clip-rule="evenodd" />
+                        </svg>
+                        Select Multiple Images
+                    </button>
+
+                    <input id="batch-file-input"
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.webp"
+                        class="file-input-hidden"
+                    />
+                </div>
             </div>
-          </div>
         </div>
 
-        <div id="error-message" class="mt-4 rounded-lg bg-red-500/15 border border-red-500/30 text-red-200 px-3 py-2 text-sm hidden"></div>
-      </div>
+        <!-- Error toast (initially hidden) -->
+        <div id="error-toast" class="mt-4 rounded-lg bg-red-500/15 border border-red-500/30 text-red-200 px-4 py-2 toast-transition hidden opacity-0 transform -translate-y-2">
+            <span id="error-message"></span>
+        </div>
+
+        <!-- Why Use Row -->
+        <section class="mt-12">
+            <h3 class="text-center text-3xl font-bold">Why Use ResizedImage.com?</h3>
+            <div class="mt-8 grid md:grid-cols-3 gap-6">
+                <div class="feature-card rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <div class="font-semibold text-lg">Lightning Fast</div>
+                    <p class="mt-2 text-slate-200/90">Resize images in seconds without compromising quality using our optimized algorithms.</p>
+                </div>
+                <div class="feature-card rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <div class="font-semibold text-lg">Secure & Private</div>
+                    <p class="mt-2 text-slate-200/90">Your images are processed in your browser and never uploaded to our servers.</p>
+                </div>
+                <div class="feature-card rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                    <div class="text-3xl mb-2">🎚️</div>
+                    <div class="font-semibold text-lg">Advanced Controls</div>
+                    <p class="mt-2 text-slate-200/90">Precise dimension control, quality adjustment, and multiple format options.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Upload Stats Section -->
+        <section class="mt-16 text-center">
+            <h3 class="text-2xl font-bold mb-6">Trusted by Thousands</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-blue-400">500K+</div>
+                    <div class="text-slate-300">Images Resized</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-green-400">99%</div>
+                    <div class="text-slate-300">Satisfaction Rate</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-purple-400">2s</div>
+                    <div class="text-slate-300">Avg. Processing Time</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-yellow-400">100%</div>
+                    <div class="text-slate-300">Browser Processing</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Testimonials -->
+    <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-16">
+        <h3 class="text-center text-2xl font-bold mb-8">What Our Users Say</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 text-xl">★★★★★</div>
+                </div>
+                <p class="text-slate-200/90">"The fastest image resizer I've ever used. Perfect for my social media content!"</p>
+                <div class="mt-4 text-sm text-slate-400">- Sarah, Photographer</div>
+            </div>
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 text-xl">★★★★★</div>
+                </div>
+                <p class="text-slate-200/90">"Love that my images never leave my browser. Privacy matters!"</p>
+                <div class="mt-4 text-sm text-slate-400">- Michael, Designer</div>
+            </div>
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 text-xl">★★★★★</div>
+                </div>
+                <p class="text-slate-200/90">"Batch processing saved me hours of work. Well worth the $2!"</p>
+                <div class="mt-4 text-sm text-slate-400">- Jessica, Blogger</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-slate-300/90 mt-16">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="/terms" class="hover:text-white">Terms</a>
+            <a href="/privacy" class="hover:text-white">Privacy</a>
+            <a href="/contact" class="hover:text-white">Contact</a>
+            <a href="/api" class="hover:text-white">API</a>
+            <a href="/blog" class="hover:text-white">Blog</a>
+        </div>
+        <p class="text-center mt-4 opacity-80">© 2023 ResizedImage.com — All rights reserved</p>
+    </footer>
+
+    <!-- Modals from original index.html -->
+    <div id="editor-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+      <div class="glass-card rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl w-11/12 max-w-6xl h-[80vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 border-b border-white/15">
+        <h2 class="text-xl font-semibold">Image Editor</h2>
+        <div class="flex items-center gap-2">
+            <button id="rotate-left-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Rotate Left" aria-label="Rotate Left">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <button id="rotate-right-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Rotate Right" aria-label="Rotate Right">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.707-7.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7a1 1 0 10-2 0v3.586l-1.293-1.293z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <button id="crop-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Crop Image" aria-label="Crop Image">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M15 2a1 1 0 011 1v2a1 1 0 11-2 0V3H6v10h2a1 1 0 110 2H6a1 1 0 01-1-1V3a1 1 0 011-1h9zM3 6a1 1 0 011-1h2a1 1 0 110 2H4v10h10v-2a1 1 0 112 0v2a1 1 0 01-1 1H4a1 1 0 01-1-1V6z" />
+                </svg>
+            </button>
+            <button id="close-editor-btn" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Close" aria-label="Close Editor">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Main Content -->
+            <div class="flex-1 flex items-center justify-center p-4 bg-black/20">
+                <div id="preview-panel" class="w-full h-full flex items-center justify-center relative">
+                    <p class="text-slate-400">Image Preview</p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="w-80 bg-white/5 border-l border-white/15 overflow-y-auto">
+                <div class="p-4">
+                    <div class="space-y-2">
+                        <button class="tab-btn active-tab" data-tab="by-size">By Size</button>
+                        <button class="tab-btn" data-tab="as-percentage">As Percentage</button>
+                        <button class="tab-btn" data-tab="social-media">Social Media</button>
+                    </div>
+     <div id="by-size" class="tab-content">
+     <div class="flex items-center mb-4">
+     <label for="width" class="w-16">Width:</label>
+     <input type="number" id="width" class="form-input w-24">
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="height" class="w-16">Height:</label>
+     <input type="number" id="height" class="form-input w-24">
+     </div>
+     <div class="flex items-center">
+     <input type="checkbox" id="lock-aspect" class="mr-2" checked>
+     <label for="lock-aspect">Lock aspect ratio</label>
+     </div>
+     <div class="flex items-center mt-4">
+     <input type="checkbox" id="background-fill" class="mr-2">
+     <label for="background-fill">Background Fill</label>
+     <input type="color" id="background-color" class="ml-2" value="#ffffff">
+     </div>
+     </div>
+     <div class="flex items-center mt-4">
+     <label for="as-percentage-units" class="mr-2">Units:</label>
+     <select id="as-percentage-units" class="form-select">
+     <option value="px">Pixels</option>
+     <option value="in">Inches</option>
+     <option value="cm">Centimeters</option>
+     <option value="mm">Millimeters</option>
+     </select>
+     </div>
+     <div id="as-percentage" class="tab-content hidden">
+     <div class="flex items-center mb-4">
+     <input type="range" id="percentage-slider" min="1" max="200" value="100" class="w-full mr-4">
+     <span id="percentage-value">100%</span>
+     </div>
+     </div>
+     <div id="social-media" class="tab-content hidden">
+     <div class="flex items-center mb-4">
+     <label for="social-platform" class="mr-2">Platform:</label>
+     <select id="social-platform" class="form-select w-full">
+     <option value="">Select Platform</option>
+     </select>
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="social-preset" class="mr-2">Preset:</label>
+     <select id="social-preset" class="form-select w-full" disabled>
+     <option value="">Select Preset</option>
+     </select>
+     </div>
+     </div>
+     <div class="mt-8">
+     <h3 class="text-lg font-semibold mb-4">Export Settings</h3>
+     <div class="flex items-center mb-4">
+     <label for="target-size" class="mr-2">Target File Size (optional):</label>
+     <input type="number" id="target-size" class="form-input w-24">
+     <select id="target-size-unit" class="form-select ml-2">
+     <option value="KB">KB</option>
+     <option value="MB">MB</option>
+     </select>
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="format" class="mr-2">Save Image As:</label>
+     <select id="format" class="form-select">
+     <option value="original">Original</option>
+     <option value="jpeg">JPEG</option>
+     <option value="png">PNG</option>
+     <option value="webp">WebP</option>
+     </select>
+     </div>
+                    <button id="export-btn" class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-semibold px-4 py-2 transition-colors shadow-lg shadow-blue-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Export Image
+                    </button>
+                    <button id="export-btn" class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-slate-900 font-semibold px-4 py-2 transition-colors shadow-lg shadow-blue-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Export Image
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <!-- Crop Modal -->
-  <div id="crop-modal" class="fixed inset-0 z-50 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4 p-4 bg-black/50 hidden">
-    <div id="crop-container" class="relative rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden">
-      <div id="crop-wrapper" class="w-full h-full min-h-[360px] grid place-items-center">
-        <img id="crop-image" alt="to crop" class="max-w-full max-h-full select-none pointer-events-none">
-        <div id="crop-darken" class="pointer-events-none absolute inset-0"></div>
-        <!-- selection box -->
-        <div id="crop-selection" class="absolute border-2 border-white/90 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]">
-          <!-- rule-of-thirds grid -->
-          <div class="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-            <div class="border border-white/30"></div>
-          </div>
-          <!-- handles -->
-          <span data-handle="tl" class="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-white shadow cursor-nwse-resize"></span>
-          <span data-handle="tm" class="absolute -top-1 left-1/2 -translate-x-1/2 h-3 w-3 rounded-full bg-white shadow cursor-ns-resize"></span>
-          <span data-handle="tr" class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-white shadow cursor-nesw-resize"></span>
-          <span data-handle="ml" class="absolute top-1/2 -translate-y-1/2 -left-1 h-3 w-3 rounded-full bg-white shadow cursor-ew-resize"></span>
-          <span data-handle="mr" class="absolute top-1/2 -translate-y-1/2 -right-1 h-3 w-3 rounded-full bg-white shadow cursor-ew-resize"></span>
-          <span data-handle="bl" class="absolute -bottom-1 -left-1 h-3 w-3 rounded-full bg-white shadow cursor-nesw-resize"></span>
-          <span data-handle="bm" class="absolute -bottom-1 left-1/2 -translate-x-1/2 h-3 w-3 rounded-full bg-white shadow cursor-ns-resize"></span>
-          <span data-handle="br" class="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-white shadow cursor-nwse-resize"></span>
-        </div>
-      </div>
+    </div>
+    <div id="crop-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+     <div class="bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-4xl">
+     <div class="p-8">
+     <h2 class="text-2xl font-bold">Crop Image</h2>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+     <div class="md:col-span-2">
+     <div id="crop-preview-panel" class="bg-gray-700 h-96 relative overflow-hidden">
+     </div>
+     </div>
+     <div>
+     <h3 class="text-lg font-semibold mb-4">Crop Rectangle</h3>
+     <div class="flex items-center mb-4">
+     <label for="crop-width" class="w-16">Width:</label>
+     <input type="number" id="crop-width" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="crop-height" class="w-16">Height:</label>
+     <input type="number" id="crop-height" class="w-24 border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     </div>
+     <div class="flex items-center mb-4">
+     <label for="aspect-ratio" class="mr-2">Aspect Ratio:</label>
+     <select id="aspect-ratio" class="border border-gray-600 rounded px-2 py-1 bg-gray-800 text-white">
+     <option value="free">Freeform</option>
+     <option value="original">Original</option>
+     <option value="custom">Custom</option>
+     <option value="1:1">1:1 (Square)</option>
+     <option value="4:3">4:3 (Monitor)</option>
+     <option value="16:9">16:9 (Widescreen)</option>
+     <option value="16:10">16:10</option>
+     <option value="3:2">3:2</option>
+     <option value="5:4">5:4</option>
+     <option value="2:1">2:1</option>
+     <option value="3:1">3:1</option>
+     <option value="4:1">4:1</option>
+     <option value="14:9">14:9</option>
+     <option value="19:10">19:10</option>
+     <option value="21:9">21:9 (Cinemascope)</option>
+     <option value="32:9">32:9 (Super Ultra Wide)</option>
+     </select>
+     </div>
+     <button id="apply-crop-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-2">
+     Crop
+     </button>
+     <button id="reset-crop-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full">
+     Reset
+     </button>
+     </div>
+     </div>
+     </div>
+     </div>
     </div>
 
-    <!-- Right controls -->
-    <div class="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 flex flex-col">
-      <div class="flex items-center justify-between">
-        <div class="text-lg font-semibold">Crop Rectangle</div>
-        <button onclick="hideCropModal()" class="size-9 grid place-items-center rounded-full bg-white/15 border border-white/20">✕</button>
-      </div>
+    <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const MAX_MB = 10;
+            // Renamed from uploadSingleBtn to singleUploadBtn
+            const singleUploadBtn = document.getElementById('single-upload-btn');
+            // Renamed from uploadBatchBtn to batchUploadBtn
+            const batchUploadBtn = document.getElementById('batch-upload-btn');
+            const singleFileInput = document.getElementById('single-file-input');
+            const batchFileInput = document.getElementById('batch-file-input');
+            // Renamed from errorDisplay to errorToast and errorMessage
+            const errorToast = document.getElementById('error-toast');
+            const errorMessage = document.getElementById('error-message');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileNav = document.getElementById('mobile-nav');
 
-      <div class="mt-3 grid grid-cols-2 gap-3 items-end">
-        <div>
-          <div class="text-sm text-white/90 mb-1.5">Width</div>
-          <input id="crop-width" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3" inputmode="numeric">
-        </div>
-        <div>
-          <div class="text-sm text-white/90 mb-1.5">Height</div>
-          <input id="crop-height" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3" inputmode="numeric">
-        </div>
-      </div>
+            // Modals and editor elements (from original JS)
+            const editorModal = document.getElementById('editor-modal');
+            const closeEditorBtn = document.getElementById('close-editor-btn');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            const lockAspectCheckbox = document.getElementById('lock-aspect');
+            let originalWidth, originalHeight;
+            const percentageSlider = document.getElementById('percentage-slider');
+            const percentageValueSpan = document.getElementById('percentage-value');
+            const unitsSelect = document.getElementById('as-percentage-units');
+            const socialPlatformSelect = document.getElementById('social-platform');
+            const socialPresetSelect = document.getElementById('social-preset');
+            let socialPresets = {};
+            const exportBtn = document.getElementById('export-btn');
+            const cropBtn = document.getElementById('crop-btn');
+            const cropModal = document.getElementById('crop-modal');
+            const cropPreviewPanel = document.getElementById('crop-preview-panel');
+            const applyCropBtn = document.getElementById('apply-crop-btn');
+            const resetCropBtn = document.getElementById('reset-crop-btn');
+            const aspectRatioSelect = document.getElementById('aspect-ratio');
+            const cropWidthInput = document.getElementById('crop-width');
+            const cropHeightInput = document.getElementById('crop-height');
+            let cropper;
+            let currentImageSrc = '';
+            const rotateLeftBtn = document.getElementById('rotate-left-btn');
+            const rotateRightBtn = document.getElementById('rotate-right-btn');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
 
-      <div class="mt-3">
-        <div class="text-sm text-white/90 mb-1.5">Aspect Ratio</div>
-        <select id="crop-aspect" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3">
-          <option value="free">FreeForm</option>
-          <option value="original">Original</option>
-          <option value="custom">Custom</option>
-          <option value="1:1">1:1 (Square)</option>
-          <option value="4:3">4:3 (Monitor)</option>
-          <option value="16:9">16:9 (Widescreen)</option>
-          <option value="9:16">9:16</option>
-        </select>
-        <div id="custom-aspect-controls" class="mt-2 grid grid-cols-2 gap-2 hidden">
-          <div>
-            <div class="text-sm text-white/90 mb-1.5">Ratio W</div>
-            <input id="custom-aspect-w" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3" inputmode="numeric" value="1">
-          </div>
-          <div>
-            <div class="text-sm text-white/90 mb-1.5">Ratio H</div>
-            <input id="custom-aspect-h" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3" inputmode="numeric" value="1">
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <div class="text-base font-semibold mb-2">Crop Position</div>
-        <div class="grid grid-cols-2 gap-3 items-end">
-          <div>
-            <div class="text-sm text-white/90 mb-1.5">Position (X)</div>
-            <input id="crop-x" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3" inputmode="numeric">
-          </div>
-          <div>
-            <div class="text-sm text-white/90 mb-1.5">Position (Y)</div>
-            <input id="crop-y" class="w-full h-10 rounded-lg bg-white/10 border border-white/20 px-3" inputmode="numeric">
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-auto grid grid-cols-[1fr_auto] gap-3 pt-4">
-        <button onclick="resetCrop()" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/20">Reset</button>
-        <button onclick="applyCrop()" class="px-4 py-2 rounded-lg bg-indigo-400/90 text-slate-900 font-semibold hover:bg-indigo-400">Crop</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Global state
-    const state = {
-      img: null,
-      fileName: "image",
-      originalSize: null,
-      mode: "size",
-      lockAspect: true,
-      width: "",
-      height: "",
-      percent: 100,
-      fit: "contain",
-      bgColor: "#0b1220",
-      presetKey: "insta_square",
-      showCrop: false,
-      crop: null,
-      cropAspect: "free",
-      customAspect: { w: 1, h: 1 },
-      rotation: 0,
-      format: "image/jpeg",
-      quality: 0.92,
-      targetEnabled: false,
-      targetSize: "",
-      targetUnit: "KB",
-      estBytes: null,
-      busy: false,
-      error: null,
-      
-      // Crop modal state
-      cropModal: {
-        local: null,
-        localAspect: "free",
-        cust: { w: 1, h: 1 },
-        view: { w: 0, h: 0, scale: 1, ox: 0, oy: 0 },
-        mode: { type: null }
-      }
-    };
-
-    // Presets
-    const PRESETS = {
-      insta_square: { label: "Instagram Post (1080×1080)", w: 1080, h: 1080 },
-      insta_story: { label: "Instagram Story (1080×1920)", w: 1080, h: 1920 },
-      yt_thumb: { label: "YouTube Thumbnail (1280×720)", w: 1280, h: 720 },
-      twitter_post: { label: "X/Twitter Post (1600×900)", w: 1600, h: 900 },
-      linkedin_banner: { label: "LinkedIn Cover (1584×396)", w: 1584, h: 396 },
-      pinterest: { label: "Pinterest (1000×1500)", w: 1000, h: 1500 },
-    };
-
-    // DOM elements
-    const elements = {
-      fileInput: document.getElementById('file-input'),
-      dropZone: document.getElementById('drop-zone'),
-      emptyState: document.getElementById('empty-state'),
-      imageContainer: document.getElementById('image-container'),
-      previewCanvas: document.getElementById('preview-canvas'),
-      exportCanvas: document.getElementById('export-canvas'),
-      exportBtn: document.getElementById('export-btn'),
-      originalSize: document.getElementById('original-size'),
-      originalDimensions: document.getElementById('original-dimensions'),
-      originalBytes: document.getElementById('original-bytes'),
-      modeTabs: document.getElementById('mode-tabs'),
-      sizeControls: document.getElementById('size-controls'),
-      percentControls: document.getElementById('percent-controls'),
-      percentValue: document.getElementById('percent-value'),
-      percentSlider: document.getElementById('percent-slider'),
-      presetControls: document.getElementById('preset-controls'),
-      presetSelect: document.getElementById('preset-select'),
-      widthInput: document.getElementById('width-input'),
-      heightInput: document.getElementById('height-input'),
-      lockAspect: document.getElementById('lock-aspect'),
-      bgColor: document.getElementById('bg-color'),
-      formatSelect: document.getElementById('format-select'),
-      qualityValue: document.getElementById('quality-value'),
-      qualitySlider: document.getElementById('quality-slider'),
-      targetSizeToggle: document.getElementById('target-size-toggle'),
-      targetSizeControls: document.getElementById('target-size-controls'),
-      targetSizeInput: document.getElementById('target-size-input'),
-      targetSizeUnit: document.getElementById('target-size-unit'),
-      targetUnitSelect: document.getElementById('target-unit-select'),
-      outputDimensions: document.getElementById('output-dimensions'),
-      estimatedSize: document.getElementById('estimated-size'),
-      errorMessage: document.getElementById('error-message'),
-      
-      // Crop modal elements
-      cropModal: document.getElementById('crop-modal'),
-      cropContainer: document.getElementById('crop-container'),
-      cropWrapper: document.getElementById('crop-wrapper'),
-      cropImage: document.getElementById('crop-image'),
-      cropDarken: document.getElementById('crop-darken'),
-      cropSelection: document.getElementById('crop-selection'),
-      cropWidth: document.getElementById('crop-width'),
-      cropHeight: document.getElementById('crop-height'),
-      cropAspect: document.getElementById('crop-aspect'),
-      customAspectControls: document.getElementById('custom-aspect-controls'),
-      customAspectW: document.getElementById('custom-aspect-w'),
-      customAspectH: document.getElementById('custom-aspect-h'),
-      cropX: document.getElementById('crop-x'),
-      cropY: document.getElementById('crop-y')
-    };
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      setupEventListeners();
-    });
-
-    function setupEventListeners() {
-      // File input
-      elements.fileInput.addEventListener('change', (e) => onPick(e.target.files));
-      
-      // Drag and drop
-      elements.dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        elements.dropZone.classList.add('border-blue-400');
-      });
-      
-      elements.dropZone.addEventListener('dragleave', () => {
-        elements.dropZone.classList.remove('border-blue-400');
-      });
-      
-      elements.dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        elements.dropZone.classList.remove('border-blue-400');
-        onPick(e.dataTransfer.files);
-      });
-      
-      // Mode tabs
-      Array.from(elements.modeTabs.querySelectorAll('button')).forEach(btn => {
-        btn.addEventListener('click', () => {
-          const mode = btn.dataset.mode;
-          state.mode = mode;
-          updateModeUI();
-          drawPreview();
-        });
-      });
-      
-      // Size controls
-      elements.widthInput.addEventListener('input', (e) => {
-        state.width = e.target.value === "" ? "" : Number(e.target.value);
-        if (state.lockAspect && state.originalSize && state.width !== "") {
-          const ar = state.originalSize.w / state.originalSize.h;
-          state.height = Math.max(1, Math.round(Number(state.width) / ar));
-          elements.heightInput.value = state.height;
-        }
-        drawPreview();
-      });
-      
-      elements.heightInput.addEventListener('input', (e) => {
-        state.height = e.target.value === "" ? "" : Number(e.target.value);
-        if (state.lockAspect && state.originalSize && state.height !== "") {
-          const ar = state.originalSize.w / state.originalSize.h;
-          state.width = Math.max(1, Math.round(Number(state.height) * ar));
-          elements.widthInput.value = state.width;
-        }
-        drawPreview();
-      });
-      
-      elements.lockAspect.addEventListener('change', (e) => {
-        state.lockAspect = e.target.checked;
-        drawPreview();
-      });
-      
-      // Percent controls
-      elements.percentSlider.addEventListener('input', (e) => {
-        state.percent = Number(e.target.value);
-        elements.percentValue.textContent = state.percent;
-        drawPreview();
-      });
-      
-      // Preset controls
-      elements.presetSelect.addEventListener('change', (e) => {
-        state.presetKey = e.target.value;
-        drawPreview();
-      });
-      
-      Array.from(document.querySelectorAll('[data-fit]')).forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.fit = btn.dataset.fit;
-          updateFitUI();
-          drawPreview();
-        });
-      });
-      
-      // Background color
-      elements.bgColor.addEventListener('change', (e) => {
-        state.bgColor = e.target.value;
-        drawPreview();
-      });
-      
-      // Export controls
-      elements.formatSelect.addEventListener('change', (e) => {
-        state.format = e.target.value;
-        drawPreview();
-      });
-      
-      elements.qualitySlider.addEventListener('input', (e) => {
-        state.quality = Number(e.target.value) / 100;
-        elements.qualityValue.textContent = e.target.value;
-        drawPreview();
-      });
-      
-      elements.targetSizeToggle.addEventListener('change', (e) => {
-        state.targetEnabled = e.target.checked;
-        elements.targetSizeControls.classList.toggle('hidden', !state.targetEnabled);
-        drawPreview();
-      });
-      
-      elements.targetSizeInput.addEventListener('input', (e) => {
-        state.targetSize = e.target.value === "" ? "" : Number(e.target.value);
-      });
-      
-      elements.targetUnitSelect.addEventListener('change', (e) => {
-        state.targetUnit = e.target.value;
-        elements.targetSizeUnit.textContent = state.targetUnit;
-      });
-      
-      // Export button
-      elements.exportBtn.addEventListener('click', doExport);
-      
-      // Crop modal events
-      setupCropModalEvents();
-    }
-
-    function setupCropModalEvents() {
-      // Aspect ratio change
-      elements.cropAspect.addEventListener('change', (e) => {
-        state.cropModal.localAspect = e.target.value;
-        if (state.cropModal.localAspect === 'custom') {
-          elements.customAspectControls.classList.remove('hidden');
-        } else {
-          elements.customAspectControls.classList.add('hidden');
-        }
-        applyAspectToCrop();
-      });
-      
-      // Custom aspect inputs
-      elements.customAspectW.addEventListener('input', (e) => {
-        state.cropModal.cust.w = Number(e.target.value) || 1;
-        applyAspectToCrop();
-      });
-      
-      elements.customAspectH.addEventListener('input', (e) => {
-        state.cropModal.cust.h = Number(e.target.value) || 1;
-        applyAspectToCrop();
-      });
-      
-      // Crop dimension inputs
-      elements.cropWidth.addEventListener('input', (e) => {
-        const w = Number(e.target.value) || 0;
-        if (w > 0) {
-          const h = state.cropModal.local.h;
-          const next = applyAspect({ ...state.cropModal.local, w }, 'br');
-          updateCropSelection(next);
-        }
-      });
-      
-      elements.cropHeight.addEventListener('input', (e) => {
-        const h = Number(e.target.value) || 0;
-        if (h > 0) {
-          const w = state.cropModal.local.w;
-          const next = applyAspect({ ...state.cropModal.local, h }, 'br');
-          updateCropSelection(next);
-        }
-      });
-      
-      elements.cropX.addEventListener('input', (e) => {
-        const x = Number(e.target.value) || 0;
-        if (x >= 0) {
-          state.cropModal.local.x = x;
-          updateCropSelectionUI();
-        }
-      });
-      
-      elements.cropY.addEventListener('input', (e) => {
-        const y = Number(e.target.value) || 0;
-        if (y >= 0) {
-          state.cropModal.local.y = y;
-          updateCropSelectionUI();
-        }
-      });
-      
-      // Crop selection handles
-      elements.cropSelection.addEventListener('mousedown', (e) => {
-        if (e.target.dataset.handle) {
-          onCropDown(e, 'resize', e.target.dataset.handle);
-        } else {
-          onCropDown(e, 'move');
-        }
-      });
-      
-      // Window mouse events for crop
-      window.addEventListener('mousemove', onCropMove);
-      window.addEventListener('mouseup', onCropUp);
-      
-      // Resize observer for crop container
-      new ResizeObserver(() => {
-        if (state.img && state.originalSize) {
-          computeCropView();
-        }
-      }).observe(elements.cropWrapper);
-    }
-
-    // File handling
-    function onPick(files) {
-      if (!files || !files[0]) return;
-      const f = files[0];
-      
-      // Check file size (max 10MB)
-      if (f.size > 10 * 1024 * 1024) {
-        showError("File too large. Max 10MB allowed.");
-        return;
-      }
-      
-      const url = URL.createObjectURL(f);
-      const image = new Image();
-      
-      image.onload = () => {
-        state.img = image;
-        state.fileName = f.name.replace(/\.[^.]+$/, "");
-        state.originalSize = { 
-          w: image.naturalWidth, 
-          h: image.naturalHeight, 
-          bytes: f.size 
-        };
-        
-        // Initialize crop to full image
-        state.crop = { 
-          x: 0, 
-          y: 0, 
-          w: image.naturalWidth, 
-          h: image.naturalHeight 
-        };
-        
-        // Update UI
-        updateUI();
-        drawPreview();
-        
-        // Show crop modal immediately
-        showCropModal();
-        
-        URL.revokeObjectURL(url);
-      };
-      
-      image.onerror = () => {
-        showError("Failed to load image. Try another file.");
-      };
-      
-      image.src = url;
-    }
-
-    function updateUI() {
-      // Show image container and hide empty state
-      elements.emptyState.classList.add('hidden');
-      elements.imageContainer.classList.remove('hidden');
-      elements.originalSize.classList.remove('hidden');
-      
-      // Update original size info
-      elements.originalDimensions.textContent = `${state.originalSize.w}×${state.originalSize.h}`;
-      elements.originalBytes.textContent = readable(state.originalSize.bytes);
-      
-      // Enable export button
-      elements.exportBtn.disabled = false;
-      
-      // Reset controls
-      state.width = "";
-      state.height = "";
-      state.percent = 100;
-      state.mode = "size";
-      state.estBytes = null;
-      state.rotation = 0;
-      
-      elements.widthInput.value = "";
-      elements.heightInput.value = "";
-      elements.percentSlider.value = "100";
-      elements.percentValue.textContent = "100";
-      
-      updateModeUI();
-    }
-
-    function updateModeUI() {
-      // Update active mode tab
-      Array.from(elements.modeTabs.querySelectorAll('button')).forEach(btn => {
-        if (btn.dataset.mode === state.mode) {
-          btn.classList.add('bg-white/90', 'text-slate-900');
-          btn.classList.remove('text-white/80', 'hover:bg-white/10');
-        } else {
-          btn.classList.remove('bg-white/90', 'text-slate-900');
-          btn.classList.add('text-white/80', 'hover:bg-white/10');
-        }
-      });
-      
-      // Show/hide controls
-      elements.sizeControls.classList.toggle('hidden', state.mode !== 'size');
-      elements.percentControls.classList.toggle('hidden', state.mode !== 'percent');
-      elements.presetControls.classList.toggle('hidden', state.mode !== 'preset');
-      
-      // Update fit UI
-      updateFitUI();
-    }
-
-    function updateFitUI() {
-      Array.from(document.querySelectorAll('[data-fit]')).forEach(btn => {
-        if (btn.dataset.fit === state.fit) {
-          btn.classList.add('bg-white/90', 'text-slate-900');
-          btn.classList.remove('text-white/80', 'hover:bg-white/10');
-        } else {
-          btn.classList.remove('bg-white/90', 'text-slate-900');
-          btn.classList.add('text-white/80', 'hover:bg-white/10');
-        }
-      });
-    }
-
-    // Image processing
-    function calculateTargetDimensions() {
-      if (!state.originalSize) return { w: 0, h: 0 };
-      const ar = state.originalSize.w / state.originalSize.h;
-      
-      if (state.mode === "percent") {
-        const w = Math.max(1, Math.round((state.originalSize.w * state.percent) / 100));
-        const h = Math.max(1, Math.round((state.originalSize.h * state.percent) / 100));
-        return { w, h };
-      }
-      
-      if (state.mode === "preset") {
-        const p = PRESETS[state.presetKey];
-        if (!p) return { w: state.originalSize.w, h: state.originalSize.h };
-        if (state.fit === "exact") return { w: p.w, h: p.h };
-        
-        const targetAR = p.w / p.h;
-        if (state.fit === "contain") {
-          if (ar > targetAR) {
-            const w = p.w; 
-            const h = Math.round(p.w / ar); 
-            return { w, h };
-          } else {
-            const h = p.h; 
-            const w = Math.round(p.h * ar); 
-            return { w, h };
-          }
-        } else { // cover
-          if (ar > targetAR) {
-            const h = p.h; 
-            const w = Math.round(p.h * ar); 
-            return { w, h };
-          } else {
-            const w = p.w; 
-            const h = Math.round(p.w / ar); 
-            return { w, h };
-          }
-        }
-      }
-      
-      // mode === "size"
-      let w = typeof state.width === "number" && state.width > 0 ? Math.round(state.width) : 0;
-      let h = typeof state.height === "number" && state.height > 0 ? Math.round(state.height) : 0;
-      
-      if (state.lockAspect) {
-        if (w && !h) h = Math.max(1, Math.round(w / ar));
-        if (h && !w) w = Math.max(1, Math.round(h * ar));
-      }
-      
-      if (!w && !h) return { w: state.originalSize.w, h: state.originalSize.h };
-      if (!w) w = Math.max(1, Math.round(h * ar));
-      if (!h) h = Math.max(1, Math.round(w / ar));
-      
-      return { w, h };
-    }
-
-    function getRotatedTargetDims(targetDims) {
-      return state.rotation === 90 || state.rotation === 270 
-        ? { w: targetDims.h, h: targetDims.w } 
-        : targetDims;
-    }
-
-    function drawPreview() {
-      if (!state.img || !state.originalSize) return;
-      const pv = elements.previewCanvas;
-      if (!pv) return;
-      
-      // Calculate preview scale to fit card
-      const cardW = pv.parentElement ? pv.parentElement.clientWidth : 800;
-      const cardH = pv.parentElement ? pv.parentElement.clientHeight : 600;
-      
-      const targetDims = calculateTargetDimensions();
-      const { w: tw, h: th } = targetDims;
-      
-      const scale = Math.min(cardW / tw, cardH / th, 1);
-      const vw = Math.max(1, Math.round(tw * scale));
-      const vh = Math.max(1, Math.round(th * scale));
-      
-      pv.width = vw; 
-      pv.height = vh;
-      const ctx = pv.getContext("2d");
-      if (!ctx) return;
-      
-      // Prepare source canvas (apply crop first)
-      const src = document.createElement("canvas");
-      const activeCrop = state.crop ?? { 
-        x: 0, y: 0, 
-        w: state.originalSize.w, 
-        h: state.originalSize.h 
-      };
-      
-      src.width = activeCrop.w; 
-      src.height = activeCrop.h;
-      const sctx = src.getContext("2d");
-      sctx.imageSmoothingEnabled = true; 
-      sctx.imageSmoothingQuality = "high";
-      sctx.drawImage(
-        state.img, 
-        activeCrop.x, activeCrop.y, activeCrop.w, activeCrop.h, 
-        0, 0, activeCrop.w, activeCrop.h
-      );
-      
-      // Draw to target (fit/cover/exact + background fill)
-      const off = document.createElement("canvas");
-      off.width = Math.max(1, tw); 
-      off.height = Math.max(1, th);
-      const offCtx = off.getContext("2d");
-      offCtx.imageSmoothingEnabled = true; 
-      offCtx.imageSmoothingQuality = "high";
-      offCtx.fillStyle = state.bgColor; 
-      offCtx.fillRect(0, 0, off.width, off.height);
-      
-      const ar = activeCrop.w / activeCrop.h; 
-      const tar = tw / th;
-      let dx = 0, dy = 0, dw = tw, dh = th;
-      
-      if (state.mode === "preset") {
-        if (state.fit === "contain") {
-          if (ar > tar) { 
-            dw = tw; 
-            dh = Math.round(tw / ar); 
-            dy = Math.round((th - dh) / 2); 
-          } else { 
-            dh = th; 
-            dw = Math.round(th * ar); 
-            dx = Math.round((tw - dw) / 2); 
-          }
-        } else if (state.fit === "cover") {
-          // cover: scale larger then center-crop
-          if (ar > tar) { // wider than target
-            const s = th * ar; // width when height==th
-            dx = Math.round((tw - s) / 2); 
-            dw = Math.round(s); 
-            dh = th;
-          } else {
-            const s = tw / ar; // height when width==tw
-            dy = Math.round((th - s) / 2); 
-            dh = Math.round(s); 
-            dw = tw;
-          }
-        }
-      }
-      
-      offCtx.drawImage(src, 0, 0, activeCrop.w, activeCrop.h, dx, dy, dw, dh);
-      
-      // Apply rotation on the final target if needed
-      let drawFrom = off;
-      if (state.rotation !== 0) {
-        const rot = document.createElement("canvas");
-        const radians = (state.rotation * Math.PI) / 180;
-        if (state.rotation === 90 || state.rotation === 270) { 
-          rot.width = th; 
-          rot.height = tw; 
-        } else { 
-          rot.width = tw; 
-          rot.height = th; 
-        }
-        const rctx = rot.getContext("2d");
-        rctx.translate(rot.width / 2, rot.height / 2);
-        rctx.rotate(radians);
-        rctx.drawImage(off, -tw / 2, -th / 2);
-        drawFrom = rot;
-      }
-      
-      // Finally scale to preview canvas
-      ctx.clearRect(0, 0, vw, vh);
-      ctx.imageSmoothingEnabled = true; 
-      ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(drawFrom, 0, 0, vw, vh);
-      
-      // Update output dimensions
-      const rotatedDims = getRotatedTargetDims(targetDims);
-      elements.outputDimensions.textContent = `${rotatedDims.w}×${rotatedDims.h}`;
-      
-      // Estimate file size
-      estimateFileSize(drawFrom);
-    }
-
-    function estimateFileSize(canvas) {
-      if (!state.img) return;
-      
-      const mime = state.format === "original" ? "image/png" : state.format;
-      const quality = state.quality;
-      
-      // Use setTimeout to avoid blocking UI
-      setTimeout(() => {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            state.estBytes = blob.size;
-            elements.estimatedSize.textContent = readable(blob.size);
-          }
-        }, mime, quality);
-      }, 100);
-    }
-
-    function readable(bytes) {
-      if (!bytes && bytes !== 0) return "—";
-      const kb = bytes / 1024;
-      if (kb < 1024) return `${kb.toFixed(1)} KB`;
-      return `${(kb / 1024).toFixed(2)} MB`;
-    }
-
-    // Export
-    async function doExport() {
-      if (!state.img || !state.originalSize || state.busy) return;
-      state.busy = true;
-      elements.exportBtn.textContent = "Exporting…";
-      elements.exportBtn.disabled = true;
-      
-      try {
-        const targetDims = calculateTargetDimensions();
-        const { w: tw, h: th } = targetDims;
-        
-        // source after crop
-        const activeCrop = state.crop ?? { 
-          x: 0, y: 0, 
-          w: state.originalSize.w, 
-          h: state.originalSize.h 
-        };
-        
-        const src = document.createElement("canvas");
-        src.width = activeCrop.w; 
-        src.height = activeCrop.h;
-        const sctx = src.getContext("2d");
-        sctx.imageSmoothingEnabled = true; 
-        sctx.imageSmoothingQuality = "high";
-        sctx.drawImage(
-          state.img, 
-          activeCrop.x, activeCrop.y, activeCrop.w, activeCrop.h, 
-          0, 0, activeCrop.w, activeCrop.h
-        );
-        
-        // target
-        const out = elements.exportCanvas;
-        out.width = Math.max(1, state.rotation === 90 || state.rotation === 270 ? th : tw);
-        out.height = Math.max(1, state.rotation === 90 || state.rotation === 270 ? tw : th);
-        const ctx = out.getContext("2d");
-        ctx.imageSmoothingEnabled = true; 
-        ctx.imageSmoothingQuality = "high";
-        ctx.fillStyle = state.bgColor; 
-        ctx.fillRect(0, 0, out.width, out.height);
-        
-        // first draw onto temp according to fit/exact
-        const temp = document.createElement("canvas"); 
-        temp.width = tw; 
-        temp.height = th;
-        const tctx = temp.getContext("2d"); 
-        tctx.imageSmoothingEnabled = true; 
-        tctx.imageSmoothingQuality = "high";
-        tctx.fillStyle = state.bgColor; 
-        tctx.fillRect(0, 0, tw, th);
-        
-        const ar = activeCrop.w / activeCrop.h; 
-        const tar = tw / th;
-        let dx = 0, dy = 0, dw = tw, dh = th;
-        
-        if (state.mode === "preset") {
-          if (state.fit === "contain") {
-            if (ar > tar) { 
-              dw = tw; 
-              dh = Math.round(tw / ar); 
-              dy = Math.round((th - dh) / 2); 
-            } else { 
-              dh = th; 
-              dw = Math.round(th * ar); 
-              dx = Math.round((tw - dw) / 2); 
-            }
-          } else if (state.fit === "cover") {
-            if (ar > tar) { 
-              const s = th * ar; 
-              dx = Math.round((tw - s) / 2); 
-              dw = Math.round(s); 
-              dh = th; 
-            } else { 
-              const s = tw / ar; 
-              dy = Math.round((th - s) / 2); 
-              dh = Math.round(s); 
-              dw = tw; 
-            }
-          }
-        }
-        
-        tctx.drawImage(src, 0, 0, activeCrop.w, activeCrop.h, dx, dy, dw, dh);
-        
-        // rotate if needed
-        ctx.save();
-        if (state.rotation !== 0) {
-          ctx.translate(out.width / 2, out.height / 2);
-          ctx.rotate((state.rotation * Math.PI) / 180);
-          ctx.drawImage(temp, -tw / 2, -th / 2);
-        } else {
-          ctx.drawImage(temp, 0, 0);
-        }
-        ctx.restore();
-        
-        let mime = state.format === "original" ? "image/png" : state.format;
-        let q = state.quality;
-        let blob;
-        
-        if (state.targetEnabled && state.targetSize && (mime === "image/jpeg" || mime === "image/webp")) {
-          const wanted = (typeof state.targetSize === "number" ? state.targetSize : parseFloat(state.targetSize)) * 
-                         (state.targetUnit === "MB" ? 1024 * 1024 : 1024);
-          
-          // Binary search for quality that gets closest to target size
-          let lo = 0.1, hi = 1.0;
-          let best = { blob: await encode(out, mime, q), q };
-          
-          for (let i = 0; i < 8; i++) {
-            const mid = (lo + hi) / 2;
-            const b = await encode(out, mime, mid);
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+            });
             
-            if (Math.abs(b.size - wanted) < Math.abs(best.blob.size - wanted)) {
-              best = { blob: b, q: mid };
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileMenuBtn.contains(event.target) && !mobileNav.contains(event.target)) {
+                    mobileNav.classList.remove('active');
+                }
+            });
+            
+            // Button triggers file input
+            singleUploadBtn.addEventListener('click', function() {
+                singleFileInput.click();
+            });
+            
+            batchUploadBtn.addEventListener('click', async function() {
+                if (await isPro()) {
+                    batchFileInput.click();
+                } else {
+                    location.href = 'https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02';
+                }
+            });
+            
+            // File validation function
+            function validateFiles(files) {
+                const tooBig = Array.from(files).find(f => f.size > MAX_MB * 1024 * 1024);
+                if (tooBig) {
+                    return `"${tooBig.name}" is over ${MAX_MB}MB. Please pick smaller files.`;
+                }
+                return null;
             }
             
-            if (b.size > wanted) hi = mid;
-            else lo = mid;
-          }
-          
-          blob = best.blob;
-          q = best.q;
-        } else {
-          blob = await encode(out, mime, q);
-        }
-        
-        // Determine file extension
-        const ext = mime === "image/jpeg" ? "jpg" : 
-                   mime === "image/png" ? "png" : "webp";
-        
-        // Create download link
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        
-        const rotatedDims = getRotatedTargetDims(targetDims);
-        a.download = `${state.fileName || "image"}-${rotatedDims.w}x${rotatedDims.h}.${ext}`;
-        
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        
-        // Update estimated size
-        state.estBytes = blob.size;
-        elements.estimatedSize.textContent = readable(blob.size);
-        
-      } catch (e) {
-        showError(e?.message || "Export failed");
-      } finally {
-        state.busy = false;
-        elements.exportBtn.textContent = "Export";
-        elements.exportBtn.disabled = false;
-      }
-    }
+            // Show error toast
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorToast.classList.remove('hidden');
+                setTimeout(() => {
+                    errorToast.classList.remove('opacity-0');
+                    errorToast.classList.remove('-translate-y-2');
+                }, 10);
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    hideError();
+                }, 5000);
+            }
+            
+            // Hide error toast
+            function hideError() {
+                errorToast.classList.add('opacity-0');
+                errorToast.classList.add('-translate-y-2');
+                setTimeout(() => {
+                    errorToast.classList.add('hidden');
+                }, 300); // Match transition duration
+            }
 
-    function encode(canvas, mime, quality) {
-      return new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), mime, quality);
-      });
-    }
+            // isPro and redeem functions (from original JS)
+            async function isPro() {
+                try {
+                    const r = await fetch('/me', { credentials: 'include' });
+                    return (await r.json()).pro;
+                } catch {
+                    return false;
+                }
+            }
+           
+            async function redeem() {
+                const t = new URLSearchParams(location.search).get('token');
+                if (!t) return;
+                const r = await fetch('/unlock?token=' + encodeURIComponent(t), { credentials: 'include' });
+                const j = await r.json();
+                if (j.ok) {
+                    const u = new URL(location.href);
+                    u.searchParams.delete('token');
+                    history.replaceState({}, '', u);
+                }
+            }
+           
+            (async () => {
+                await redeem();
+                if (await isPro()) {
+                    const unlockProBtn = document.getElementById('unlock-pro-btn');
+                    if (unlockProBtn) {
+                        unlockProBtn.textContent = 'PRO User';
+                        unlockProBtn.removeAttribute('href'); // Remove the link
+                        unlockProBtn.style.cursor = 'default'; // Change cursor to indicate it's not clickable
+                        unlockProBtn.classList.remove('bg-indigo-400/90', 'hover:bg-indigo-400', 'text-slate-900');
+                        unlockProBtn.classList.add('bg-gray-600', 'text-white', 'cursor-not-allowed'); // New styling for PRO User
+                    }
+                    // Also update the mobile menu pro button
+                    const mobileProBtn = document.querySelector('#mobile-nav a[href="https://buy.stripe.com/test_cNiaEP5dQeOB5e5a255os02"]');
+                    if (mobileProBtn) {
+                        mobileProBtn.textContent = 'PRO User';
+                        mobileProBtn.removeAttribute('href');
+                        mobileProBtn.style.cursor = 'default';
+                        mobileProBtn.classList.remove('bg-indigo-400/90', 'hover:bg-indigo-400', 'text-slate-900'); // Remove old styling
+                        mobileProBtn.classList.add('bg-gray-600', 'text-white', 'cursor-not-allowed'); // New styling for PRO User
+                    }
+                }
+            })();
 
-    function showError(message) {
-      state.error = message;
-      elements.errorMessage.textContent = message;
-      elements.errorMessage.classList.remove('hidden');
-      
-      // Hide error after 5 seconds
-      setTimeout(() => {
-        elements.errorMessage.classList.add('hidden');
-        state.error = null;
-      }, 5000);
-    }
+            // Event listener for single file input change (from original JS)
+            singleFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const validationError = validateFiles([file]);
+                    if (validationError) {
+                        showError(validationError);
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            originalWidth = img.naturalWidth;
+                            originalHeight = img.naturalHeight;
+                            widthInput.value = originalWidth;
+                            heightInput.value = originalHeight;
+                            percentageSlider.value = 100;
+                            percentageValueSpan.textContent = '100%';
+                            
+                            const previewPanel = document.getElementById('preview-panel');
+                            previewPanel.innerHTML = '';
+                            previewPanel.appendChild(img);
+                            editorModal.classList.remove('hidden');
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+           
+            // Event listener for batch file input change (from original JS)
+            batchFileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    const validationError = validateFiles(files);
+                    if (validationError) {
+                        showError(validationError);
+                        return;
+                    }
+                    // For batch, we might want to show a different modal or process differently
+                    // For now, just open the editor modal as a placeholder
+                    editorModal.classList.remove('hidden');
+                }
+            });
 
-    // Image manipulation
-    function rotateLeft() {
-      state.rotation = ((state.rotation - 90) + 360) % 360;
-      drawPreview();
-    }
+            function updatePreview() {
+                const previewPanel = document.getElementById('preview-panel');
+                const currentImage = previewPanel.querySelector('img');
+                if (!currentImage) return;
 
-    function rotateRight() {
-      state.rotation = (state.rotation + 90) % 360;
-      drawPreview();
-    }
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
 
-    function resetImage() {
-      if (!state.originalSize) return;
-      state.crop = { 
-        x: 0, y: 0, 
-        w: state.originalSize.w, 
-        h: state.originalSize.h 
-      };
-      state.rotation = 0;
-      drawPreview();
-    }
+                const targetWidth = parseInt(widthInput.value);
+                const targetHeight = parseInt(heightInput.value);
 
-    // Crop modal functions
-    function showCropModal() {
-      if (!state.img || !state.originalSize) return;
-      
-      // Initialize crop modal state
-      state.cropModal.local = state.crop ?? { 
-        x: 0, y: 0, 
-        w: state.originalSize.w, 
-        h: state.originalSize.h 
-      };
-      state.cropModal.localAspect = state.cropAspect;
-      state.cropModal.cust = { ...state.customAspect };
-      
-      // Set crop image source
-      elements.cropImage.src = state.img.src;
-      
-      // Show modal
-      elements.cropModal.classList.remove('hidden');
-      
-      // Compute view dimensions
-      computeCropView();
-      
-      // Update UI
-      updateCropSelectionUI();
-      
-      // Show/hide custom aspect controls
-      elements.customAspectControls.classList.toggle(
-        'hidden', 
-        state.cropModal.localAspect !== 'custom'
-      );
-    }
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
 
-    function hideCropModal() {
-      elements.cropModal.classList.add('hidden');
-    }
+                ctx.drawImage(currentImage, 0, 0, targetWidth, targetHeight);
+                currentImage.src = canvas.toDataURL();
+            }
+            // Resize functionality (from original JS)
+            function handleResize() {
+                if (!originalWidth || !originalHeight) return;
 
-    function computeCropView() {
-      const el = elements.cropWrapper;
-      if (!el) return;
-      
-      const maxW = el.clientWidth;
-      const maxH = el.clientHeight;
-      const ar = state.originalSize.w / state.originalSize.h;
-      
-      let w = maxW, h = Math.round(maxW / ar);
-      if (h > maxH) { h = maxH; w = Math.round(maxH * ar); }
-      
-      const ox = Math.round((maxW - w) / 2);
-      const oy = Math.round((maxH - h) / 2);
-      
-      state.cropModal.view = { 
-        w, h, 
-        scale: w / state.originalSize.w, 
-        ox, oy 
-      };
-      
-      updateCropSelectionUI();
-    }
+                const aspectRatio = originalWidth / originalHeight;
+                let width = parseInt(widthInput.value);
+            
+                let height = parseInt(heightInput.value);
 
-    function updateCropSelectionUI() {
-      if (!state.cropModal.local) return;
-      
-      const { x, y, w, h } = state.cropModal.local;
-      const { scale, ox, oy } = state.cropModal.view;
-      
-      // Update selection box position and size
-      const left = Math.round(ox + x * scale);
-      const top = Math.round(oy + y * scale);
-      const width = Math.round(w * scale);
-      const height = Math.round(h * scale);
-      
-      elements.cropSelection.style.left = `${left}px`;
-      elements.cropSelection.style.top = `${top}px`;
-      elements.cropSelection.style.width = `${width}px`;
-      elements.cropSelection.style.height = `${height}px`;
-      
-      // Update darken overlay
-      const wrapW = elements.cropWrapper.clientWidth;
-      const wrapH = elements.cropWrapper.clientHeight;
-      
-      elements.cropDarken.style.setProperty('--left', `${left}px`);
-      elements.cropDarken.style.setProperty('--top', `${top}px`);
-      elements.cropDarken.style.setProperty('--right', `${Math.max(0, wrapW - left - width)}px`);
-      elements.cropDarken.style.setProperty('--bottom', `${Math.max(0, wrapH - top - height)}px`);
-      elements.cropDarken.className = 'pointer-events-none absolute inset-0 crop-outside-darken';
-      
-      // Update input fields
-      elements.cropWidth.value = w;
-      elements.cropHeight.value = h;
-      elements.cropX.value = x;
-      elements.cropY.value = y;
-      elements.cropAspect.value = state.cropModal.localAspect;
-      
-      if (state.cropModal.localAspect === 'custom') {
-        elements.customAspectW.value = state.cropModal.cust.w;
-        elements.customAspectH.value = state.cropModal.cust.h;
-      }
-    }
+                if (isNaN(width) && isNaN(height)) return;
 
-    function updateCropSelection(crop) {
-      state.cropModal.local = crop;
-      updateCropSelectionUI();
-    }
+                if (lockAspectCheckbox.checked) {
+                    if (document.activeElement === widthInput && !isNaN(width)) {
+                        heightInput.value = Math.round(width / aspectRatio);
+                    } else if (!isNaN(height)) {
+                        widthInput.value = Math.round(height * aspectRatio);
+                    }
+                }
+                
+                // Update percentage slider
+                if (!isNaN(width)) {
+                    const percentage = Math.round((width / originalWidth) * 100);
+                    percentageSlider.value = percentage;
+                    percentageValueSpan.textContent = `${percentage}%`;
+                }
+            }
 
-    function applyAspect(base, handle = "br") {
-      if (state.cropModal.localAspect === "free") return base;
-      
-      const ratio = state.cropModal.localAspect === "original" ? state.originalSize.w / state.originalSize.h
-        : state.cropModal.localAspect === "custom" ? (state.cropModal.cust.w || 1) / (state.cropModal.cust.h || 1)
-        : state.cropModal.localAspect === "1:1" ? 1
-        : state.cropModal.localAspect === "4:3" ? 4 / 3
-        : state.cropModal.localAspect === "16:9" ? 16 / 9
-        : 9 / 16;
-      
-      let { x, y, w, h } = base;
-      
-      if (w / h > ratio) { // too wide
-        w = Math.round(h * ratio);
-      } else {
-        h = Math.round(w / ratio);
-      }
-      
-      if (handle.includes("l")) x = base.x + (base.w - w);
-      if (handle.includes("t")) y = base.y + (base.h - h);
-      
-      // keep in bounds
-      x = clamp(x, 0, state.originalSize.w - w);
-      y = clamp(y, 0, state.originalSize.h - h);
-      
-      return { x, y, w, h };
-    }
+            widthInput.addEventListener('input', handleResize);
+            heightInput.addEventListener('input', handleResize);
+            lockAspectCheckbox.addEventListener('change', handleResize);
 
-    function applyAspectToCrop() {
-      if (!state.cropModal.local) return;
-      const next = applyAspect({ ...state.cropModal.local }, "br");
-      updateCropSelection(next);
-    }
+            function updatePercentageResize() {
+                if (!originalWidth || !originalHeight) return;
 
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
+                const percentage = parseInt(percentageSlider.value);
+                percentageValueSpan.textContent = `${percentage}%`;
 
-    function onCropDown(e, type, handle) {
-      e.preventDefault();
-      
-      const rect = elements.cropWrapper.getBoundingClientRect();
-      const x = (e.clientX - rect.left - state.cropModal.view.ox) / state.cropModal.view.scale;
-      const y = (e.clientY - rect.top - state.cropModal.view.oy) / state.cropModal.view.scale;
-      
-      state.cropModal.mode = { 
-        type, 
-        handle,
-        ox: x - state.cropModal.local.x,
-        oy: y - state.cropModal.local.y,
-        start: { ...state.cropModal.local }
-      };
-    }
+                const newWidth = Math.round(originalWidth * (percentage / 100));
+                const newHeight = Math.round(originalHeight * (percentage / 100));
 
-    function onCropMove(e) {
-      if (!state.cropModal.mode.type) return;
-      
-      const rect = elements.cropWrapper.getBoundingClientRect();
-      const x = (e.clientX - rect.left - state.cropModal.view.ox) / state.cropModal.view.scale;
-      const y = (e.clientY - rect.top - state.cropModal.view.oy) / state.cropModal.view.scale;
-      
-      if (state.cropModal.mode.type === "move") {
-        const newX = clamp(
-          Math.round(x - (state.cropModal.mode.ox || 0)), 
-          0, 
-          state.originalSize.w - state.cropModal.local.w
-        );
-        const newY = clamp(
-          Math.round(y - (state.cropModal.mode.oy || 0)), 
-          0, 
-          state.originalSize.h - state.cropModal.local.h
-        );
-        
-        updateCropSelection({ 
-          ...state.cropModal.local, 
-          x: newX, 
-          y: newY 
+                widthInput.value = newWidth;
+                heightInput.value = newHeight;
+            }
+
+            percentageSlider.addEventListener('input', updatePercentageResize);
+            unitsSelect.addEventListener('change', () => {
+                console.log(`Selected unit: ${unitsSelect.value}`);
+            });
+           
+            // Social presets (from original JS)
+            async function loadSocialPresets() {
+                const res = await fetch('/socialPresets.json');
+                socialPresets = await res.json();
+                for (const platform in socialPresets) {
+                    const option = document.createElement('option');
+                    option.value = platform;
+                    option.textContent = platform;
+                    socialPlatformSelect.appendChild(option);
+                }
+            }
+           
+            socialPlatformSelect.addEventListener('change', () => {
+                const platform = socialPlatformSelect.value;
+                socialPresetSelect.innerHTML = '<option value="">Select Preset</option>';
+                if (platform) {
+                    socialPresetSelect.disabled = false;
+                    for (const preset in socialPresets[platform]) {
+                        const option = document.createElement('option');
+                        option.value = preset;
+                        option.textContent = preset;
+                        socialPresetSelect.appendChild(option);
+                    }
+                } else {
+                    socialPresetSelect.disabled = true;
+                }
+            });
+           
+            socialPresetSelect.addEventListener('change', () => {
+                const platform = socialPlatformSelect.value;
+                const preset = socialPresetSelect.value;
+                if (platform && preset) {
+                    const { width, height } = socialPresets[platform][preset];
+                    widthInput.value = width;
+                    heightInput.value = height;
+                }
+            });
+           
+            loadSocialPresets();
+           
+            // Export functionality (from original JS)
+            exportBtn.addEventListener('click', async () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (!image || !image.src) {
+                    showError('Please upload an image first.');
+                    return;
+                }
+
+                const format = document.getElementById('format').value;
+                const targetSize = document.getElementById('target-size').value;
+                const targetSizeUnit = document.getElementById('target-size-unit').value;
+
+                const formData = new FormData();
+                const originalBlob = await (await fetch(image.src)).blob();
+                formData.append('files', originalBlob, 'image' + (format ? `.${format}`: ''));
+
+                formData.append('w', widthInput.value);
+                formData.append('h', heightInput.value);
+                formData.append('fmt', format);
+                formData.append('q', 0.85); // Default quality
+                formData.append('keepAspect', lockAspectCheckbox.checked ? '1' : '0');
+                if (document.getElementById('background-fill').checked) {
+                    formData.append('backgroundColor', document.getElementById('background-color').value);
+                }
+                if (targetSize) {
+                    formData.append('targetSize', targetSize);
+                    formData.append('targetSizeUnit', targetSizeUnit);
+                }
+
+                try {
+                    const res = await fetch('/process', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        const extension = format === 'original' ? 'jpg' : format;
+                        a.download = `resized.${extension}`;
+                        a.href = url;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    } else {
+                        const errorText = await res.text();
+                        showError(`Error: ${errorText}`);
+                    }
+                } catch (error) {
+                    showError('An unexpected error occurred during export.');
+                }
+            });
+           
+            // Crop functionality
+            cropBtn.addEventListener('click', () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (!image) {
+                    showError('Please upload an image first.');
+                    return;
+                }
+                currentImageSrc = image.src;
+                
+                cropPreviewPanel.innerHTML = `<img src="${currentImageSrc}" style="display: block; max-width: 100%;">`;
+                const cropImage = cropPreviewPanel.querySelector('img');
+                
+                cropModal.classList.remove('hidden');
+
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                cropper = new Cropper(cropImage, {
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    background: false,
+                    responsive: true,
+                    crop(event) {
+                        cropWidthInput.value = Math.round(event.detail.width);
+                        cropHeightInput.value = Math.round(event.detail.height);
+                    },
+                });
+            });
+
+            applyCropBtn.addEventListener('click', () => {
+                if (cropper) {
+                    const croppedCanvas = cropper.getCroppedCanvas({
+                        imageSmoothingEnabled: true,
+                        imageSmoothingQuality: 'high',
+                    });
+                    const image = document.getElementById('preview-panel').querySelector('img');
+                    
+                    // Update the main preview with the cropped image
+                    image.src = croppedCanvas.toDataURL();
+                    
+                    // Update original dimensions to cropped dimensions
+                    originalWidth = croppedCanvas.width;
+                    originalHeight = croppedCanvas.height;
+                    widthInput.value = originalWidth;
+                    heightInput.value = originalHeight;
+                    
+                    cropper.destroy();
+                    cropper = null;
+                    cropModal.classList.add('hidden');
+                }
+            });
+           
+            resetCropBtn.addEventListener('click', () => {
+                if (cropper) {
+                    cropper.reset();
+                }
+            });
+           
+            aspectRatioSelect.addEventListener('change', () => {
+                if (cropper) {
+                    const aspectRatio = aspectRatioSelect.value;
+                    if (aspectRatio === 'free') {
+                        cropper.setAspectRatio(NaN);
+                    } else if (aspectRatio === 'original') {
+                        const cropImage = cropPreviewPanel.querySelector('img');
+                        if (cropImage) {
+                            cropper.setAspectRatio(cropImage.naturalWidth / cropImage.naturalHeight);
+                        }
+                    } else {
+                        const [w, h] = aspectRatio.split(':');
+                        cropper.setAspectRatio(w / h);
+                    }
+                }
+            });
+           
+            // Rotate functionality (from original JS)
+            rotateLeftBtn.addEventListener('click', () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (image) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = image.height;
+                    canvas.height = image.width;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.drawImage(image, -image.width / 2, -image.height / 2);
+                    image.src = canvas.toDataURL();
+                }
+            });
+           
+            rotateRightBtn.addEventListener('click', () => {
+                const image = document.getElementById('preview-panel').querySelector('img');
+                if (image) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = image.height;
+                    canvas.height = image.width;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(Math.PI / 2);
+                    ctx.drawImage(image, -image.width / 2, -image.height / 2);
+                    image.src = canvas.toDataURL();
+                }
+            });
+           
+            // Tab functionality for editor modal (from original JS)
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+                    tabContents.forEach(content => content.classList.add('hidden'));
+           
+                    button.classList.add('active-tab');
+                    document.getElementById(button.dataset.tab).classList.remove('hidden');
+                });
+            });
+
+            // Close editor modal
+            closeEditorBtn.addEventListener('click', () => {
+                editorModal.classList.add('hidden');
+            });
         });
-      } 
-      else if (state.cropModal.mode.type === "resize") {
-        const s = state.cropModal.mode.start;
-        let { x, y, w, h } = s;
-        
-        const px = Math.round(x);
-        const py = Math.round(y);
-        
-        const left = state.cropModal.mode.handle?.includes("l");
-        const right = state.cropModal.mode.handle?.includes("r");
-        const top = state.cropModal.mode.handle?.includes("t");
-        const bottom = state.cropModal.mode.handle?.includes("b");
-        
-        if (left) { 
-          const nx = clamp(px, 0, s.x + s.w - 1); 
-          w = s.w + (s.x - nx); 
-          x = nx; 
-        }
-        if (right) { 
-          w = clamp(px - s.x, 1, state.originalSize.w - s.x); 
-        }
-        if (top) { 
-          const ny = clamp(py, 0, s.y + s.h - 1); 
-          h = s.h + (s.y - ny); 
-          y = ny; 
-        }
-        if (bottom) { 
-          h = clamp(py - s.y, 1, state.originalSize.h - s.y); 
-        }
-        
-        let next = { x, y, w, h };
-        next = applyAspect(next, state.cropModal.mode.handle);
-        updateCropSelection(next);
-      }
-    }
-
-    function onCropUp() {
-      state.cropModal.mode = { type: null };
-    }
-
-    function resetCrop() {
-      if (!state.originalSize) return;
-      state.cropModal.local = { 
-        x: 0, y: 0, 
-        w: state.originalSize.w, 
-        h: state.originalSize.h 
-      };
-      state.cropModal.localAspect = "free";
-      updateCropSelectionUI();
-    }
-
-    function applyCrop() {
-      state.crop = state.cropModal.local;
-      state.cropAspect = state.cropModal.localAspect;
-      state.customAspect = { ...state.cropModal.cust };
-      hideCropModal();
-      drawPreview();
-    }
-  </script>
+    </script>
 </body>
 </html>

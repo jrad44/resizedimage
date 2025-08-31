@@ -1,7 +1,4 @@
 import express from 'express';
-import multer from 'multer';
-import sharp from 'sharp';
-import archiver from 'archiver';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import path from 'path';
@@ -25,7 +22,6 @@ const validTokens = new Set(
     .filter(Boolean)
 );
 
-const upload = multer({ limits: { fileSize: 120 * 1024 * 1024 } });
 
 const FREE_MAX_FILES=1, FREE_MAX_FILE_MB=10;
 const PRO_MAX_FILES=50, PRO_MAX_FILE_MB=100, PRO_MAX_TOTAL_MB=500;
